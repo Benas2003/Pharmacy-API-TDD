@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use Faker\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -9,14 +10,20 @@ use Tests\TestCase;
 class ProductControllerTest extends TestCase
 {
     /**
-     * A basic feature test example.
-     *
-     * @return void
+     * @test
      */
-    public function test_example()
+    public function can_create_a_new_product() :void
     {
-        $response = $this->get('/');
 
-        $response->assertStatus(200);
+        $faker = Factory::create();
+
+        $response = $this->json('POST', '/api/products', [
+            'VSSLPR'=> $faker->numerify('VSSLPR#####'),
+            'name'=> $faker->word,
+            'storage_amount'=> $faker->numberBetween($min = 1000, $max = 9000),
+            'price'=> $faker->randomFloat($nbMaxDecimals = NULL, $min = 0, $max = 1000),
+        ]);
+
+        $response->assertStatus(201);
     }
 }
