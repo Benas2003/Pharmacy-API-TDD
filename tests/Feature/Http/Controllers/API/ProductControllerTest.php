@@ -32,9 +32,10 @@ class ProductControllerTest extends TestCase
             ->assertJson($data);
     }
 
-    public function test_can_delete_post() {
+    public function test_can_delete_post() :void
+    {
 
-        $product = Product::factory()->make();
+        $product = Product::factory()->create();
 
         $this->json('POST', '/api/products/{id}', ['id'=>$product->id])->assertStatus(204);
 
