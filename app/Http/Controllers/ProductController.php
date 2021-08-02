@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Illuminate\Validation\Rule;
+use Prophecy\Doubler\Generator\Node\ArgumentNode;
 
 class ProductController extends Controller
 {
@@ -40,11 +42,12 @@ class ProductController extends Controller
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show($id)
     {
-        //
+        $product = Product::find($id);
+        return response()->json($product, 200);
     }
 
     /**
@@ -52,11 +55,25 @@ class ProductController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function update(Request $request, $id)
     {
-        //
+        $request->validate([
+            'VSSLPR'=>'required|starts_with:VSSLPR',
+            'name'=>'required',
+            'amount'=>'required|numeric|gte:0',
+            'storage_amount'=>'required|numeric|gt:0',
+            'price'=>'required|numeric|gt:0',
+            'status'=>[
+                'required',
+                Rule::in(['Active', 'Inactive']),
+            ],
+        ]);
+
+        $product = Product::find($id);
+        $product->update($request->all());
+        return response()->json($product, 200);
     }
 
     /**
