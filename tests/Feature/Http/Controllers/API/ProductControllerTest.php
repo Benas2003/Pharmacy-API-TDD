@@ -3,9 +3,8 @@
 namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Product;
-use Database\Factories\ProductFactory;
 use Faker\Factory;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
 
@@ -25,7 +24,7 @@ class ProductControllerTest extends TestCase
         ];
 
         $this->post(route('products.store'), $data)
-            ->assertStatus(201)
+            ->assertStatus(ResponseAlias::HTTP_CREATED)
             ->assertJson($data);
     }
 
@@ -35,7 +34,7 @@ class ProductControllerTest extends TestCase
         $product = Product::factory()->create();
 
         $this->delete(route('products.destroy', $product->id))
-            ->assertStatus(204);
+            ->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
 
     }
 
@@ -55,7 +54,7 @@ class ProductControllerTest extends TestCase
         ];
 
         $this->put(route('products.update', $product->id), $data)
-            ->assertStatus(200)
+            ->assertStatus(ResponseAlias::HTTP_OK)
             ->assertJson($data);
     }
 
@@ -64,13 +63,13 @@ class ProductControllerTest extends TestCase
         $product = Product::factory()->create();
 
         $this->get(route('products.show', $product->id))
-            ->assertStatus(200);
+            ->assertStatus(ResponseAlias::HTTP_OK);
     }
 
     public function testIndexReturnsDataInValidFormat() {
 
         $this->get(route('products.index'))
-            ->assertStatus(Response::HTTP_OK)
+            ->assertStatus(ResponseAlias::HTTP_OK)
             ->assertJsonStructure(
                 [
                         '*' => [

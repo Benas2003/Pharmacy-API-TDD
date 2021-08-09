@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\Response;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
 {
-    public function register (Request $request): Response
+
+    public function register(Request $request): Response
     {
         $fields = $request->validate([
             'name' => 'required|string',
@@ -28,6 +30,39 @@ class AuthController extends Controller
             'message' => 'User was created successfully'
         ];
 
-        return response($response, 201);
+        return response($response, ResponseAlias::HTTP_CREATED);
     }
+
+    public function login(Request $request): Response
+    {
+        $fields = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string|confirmed',
+        ]);
+
+        $user = User::where('email', $fields['email'])->first();
+
+        if (!$user || $this->notEqual($fields['password'], $user)) {
+            return new response([
+                'message' => 'Bad data'
+            ], ResponseAlias::HTTP_UNAUTHORIZED);
+
+        }
+
+        $token = $user->createToken('PharmacyAPI')->plainTextToken;
+
+        $response = [
+            'user' => $user,
+            'token' => $token,
+        ];
+
+        return new response($response, ResponseAlias::HTTP_CREATED);
+    }
+
+    private function notEqual($password, $user): bool
+    {
+        return !Hash::check($password, $user->password);
+    }
+
+
 }
