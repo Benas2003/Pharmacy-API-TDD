@@ -59,6 +59,13 @@ class AuthController extends Controller
         return new response($response, ResponseAlias::HTTP_CREATED);
     }
 
+    public function logout(Request $request)
+    {
+        auth()->user()->tokens()->delete();
+
+        return response(null, ResponseAlias::HTTP_NO_CONTENT);
+    }
+
     private function notEqual($password, $user): bool
     {
         return !Hash::check($password, $user->password);

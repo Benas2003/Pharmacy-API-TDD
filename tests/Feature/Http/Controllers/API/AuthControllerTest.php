@@ -97,8 +97,24 @@ class AuthControllerTest extends TestCase
             ]);
     }
 
-//    public function test_user_can_logout(): void
-//    {
-//
-//    }
+    public function test_user_can_logout(): void
+    {
+        $faker = Factory::create();
+        $password = $faker->password;
+
+        $user = User::factory()->create([
+            'password'=>bcrypt($password)
+        ]);
+
+        $login = $this->post(route('login'),[
+            'email'=>$user->email,
+            'password'=>$password,
+            'password_confirmation'=>$password,
+        ])->assertStatus(ResponseAlias::HTTP_CREATED);
+
+
+        $userToken = $login->json('token');
+        $this->withHeader("Authorization","Bearer $userToken");
+        $this->post(route('logout', ))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
+    }
 }
