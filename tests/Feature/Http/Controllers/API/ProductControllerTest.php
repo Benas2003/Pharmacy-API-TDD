@@ -4,13 +4,14 @@ namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Product;
 use Faker\Factory;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
 
 class ProductControllerTest extends TestCase
 {
-
+//    use RefreshDatabase;
     public function test_can_create_a_new_product() :void
     {
 

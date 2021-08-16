@@ -19,6 +19,7 @@ class UserFactory extends Factory
      * Define the model's default state.
      *
      * @return array
+     * @throws \Exception
      */
     public function definition()
     {
@@ -26,6 +27,7 @@ class UserFactory extends Factory
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'password' => bcrypt($this->faker->password), // password
+            'role_id' => random_int(1,3),
         ];
     }
 
