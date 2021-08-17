@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\AuthController;
@@ -14,10 +15,9 @@ use App\Http\Controllers\AuthController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+$user = Auth::user();
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::resource('products', ProductController::class);
-
 
 
 Route::group(['middleware'=>['auth:sanctum']], function () {

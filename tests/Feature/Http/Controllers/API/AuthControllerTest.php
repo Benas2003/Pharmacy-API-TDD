@@ -17,7 +17,6 @@ class AuthControllerTest extends TestCase
 
         $admin = User::factory()->create([
             'password'=>bcrypt($adminPassword),
-            'role_id'=>1,
         ]);
 
         $adminLoginResponse = $this->post(route('login'),[
@@ -35,7 +34,6 @@ class AuthControllerTest extends TestCase
             'email'=>$user->email,
             'password'=>$user->password,
             'password_confirmation'=>$user->password,
-            'role_id'=>$user->role_id,
         ])
             ->assertStatus(ResponseAlias::HTTP_CREATED);
 
