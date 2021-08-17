@@ -17,8 +17,13 @@ use App\Http\Controllers\AuthController;
 */
 $user = Auth::user();
 Route::post('/login', [AuthController::class, 'login'])->name('login');
-Route::resource('products', ProductController::class);
 
+Route::get('products',[ProductController::class, 'index'])->name('products.index');
+Route::post('products',[ProductController::class, 'store'])->name('products.store');
+Route::get('products/{id}',[ProductController::class, 'show'])->name('products.show');
+Route::put('products/{id}',[ProductController::class, 'update'])->name('products.update');
+Route::delete('products/{id}',[ProductController::class, 'destroy'])->name('products.destroy');
+Route::get('products/search/{name}',[ProductController::class, 'search'])->name('products.search');
 
 Route::group(['middleware'=>['auth:sanctum']], function () {
     //Auth

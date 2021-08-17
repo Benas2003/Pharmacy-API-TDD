@@ -13,7 +13,7 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Database\Eloquent\Collection|Product[]
      */
     public function index()
     {
@@ -87,5 +87,17 @@ class ProductController extends Controller
     {
         Product::destroy($id);
         return response()->json(null, 204);
+    }
+
+    /**
+     * Search for a name.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Http\Response
+     */
+    public function search($name)
+    {
+
+        return Product::where('name', 'like', '%'.$name.'%')->get();
     }
 }

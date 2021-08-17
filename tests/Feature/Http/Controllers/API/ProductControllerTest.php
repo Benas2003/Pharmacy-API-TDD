@@ -84,4 +84,21 @@ class ProductControllerTest extends TestCase
                 ]
             );
     }
+    public function testSearchReturnsDataInValidFormat() {
+
+        $this->get(route('products.search', 'epe'))
+            ->assertStatus(ResponseAlias::HTTP_OK)
+            ->assertJsonStructure(
+                [
+                    '*' => [
+                        'VSSLPR',
+                        'name',
+                        'amount',
+                        'price',
+                        'status',
+
+                    ]
+                ]
+            );
+    }
 }
