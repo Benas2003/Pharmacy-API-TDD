@@ -34,6 +34,7 @@ class AuthControllerTest extends TestCase
             'email'=>$user->email,
             'password'=>$user->password,
             'password_confirmation'=>$user->password,
+            'role'=>'Department'
         ])
             ->assertStatus(ResponseAlias::HTTP_CREATED);
 

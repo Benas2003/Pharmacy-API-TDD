@@ -15,20 +15,28 @@ use App\Http\Controllers\AuthController;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-$user = Auth::user();
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 
-Route::get('products',[ProductController::class, 'index'])->name('products.index');
-Route::post('products',[ProductController::class, 'store'])->name('products.store');
-Route::get('products/{id}',[ProductController::class, 'show'])->name('products.show');
-Route::put('products/{id}',[ProductController::class, 'update'])->name('products.update');
-Route::delete('products/{id}',[ProductController::class, 'destroy'])->name('products.destroy');
-Route::get('products/search/{name}',[ProductController::class, 'search'])->name('products.search');
-
 Route::group(['middleware'=>['auth:sanctum']], function () {
+
     //Auth
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+    // Products' routes with Admin role
+    Route::group(['middleware' => ['role:Admin']], function () {
+        Route::post('products',[ProductController::class, 'store'])->name('products.store');
+        Route::delete('products/{id}',[ProductController::class, 'destroy'])->name('products.destroy');
+    });
+
+    // Products' routes with Admin and Pharmacist role
+    Route::group(['middleware' => ['role:Admin|Pharmacist']], function () {
+        Route::put('products/{id}',[ProductController::class, 'update'])->name('products.update');
+    });
+
+    Route::get('products',[ProductController::class, 'index'])->name('products.index');
+    Route::get('products/{id}',[ProductController::class, 'show'])->name('products.show');
+    Route::get('products/search/{name}',[ProductController::class, 'search'])->name('products.search');
 });
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {

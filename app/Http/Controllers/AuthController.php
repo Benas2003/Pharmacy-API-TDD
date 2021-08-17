@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class AuthController extends Controller
@@ -17,13 +18,21 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
+            'role'=>[
+                'required',
+                Rule::in(['Admin', 'Pharmacist', 'Department']),
+            ],
         ]);
+
+
 
         $user = User::create([
             'name' => $fields['name'],
             'email' => $fields['email'],
             'password' => bcrypt($fields['password']),
         ]);
+
+        $user->assignRole($fields['role']);
 
 
         $response = [
