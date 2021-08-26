@@ -37,7 +37,6 @@ class DatabaseSeeder extends Seeder
             'password'=>bcrypt('CR91'),
         ]);
 
-
         $admin->assignRole($role1);
         $pharmacist->assignRole($role2);
         $department->assignRole($role3);

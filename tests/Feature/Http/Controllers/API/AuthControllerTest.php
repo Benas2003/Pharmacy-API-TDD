@@ -90,9 +90,7 @@ class AuthControllerTest extends TestCase
 
     public function test_user_can_not_login_with_wrong_password(): void
     {
-        $user = User::factory()->create();
-
-        $response = $this->post(route('login'), [
+        $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
             'password' => self::WRONG_ADMIN_PASSWORD,
             'password_confirmation' => self::WRONG_ADMIN_PASSWORD,
@@ -105,8 +103,6 @@ class AuthControllerTest extends TestCase
 
     public function test_user_can_logout(): void
     {
-
-
         $userLoginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
             'password' => self::ADMIN_PASSWORD,
