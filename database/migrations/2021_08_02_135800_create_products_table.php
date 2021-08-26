@@ -20,7 +20,7 @@ class CreateProductsTable extends Migration
             $table->integer('amount')->default('0');
             $table->integer('storage_amount');
             $table->float('price');
-            $table->string('status')->default('Active');
+            $table->integer('ordered_amount')->default('0');
             $table->timestamps();
         });
     }

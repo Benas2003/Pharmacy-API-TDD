@@ -15,8 +15,8 @@ class CreateConsignmentsTable extends Migration
     {
         Schema::create('consignments', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('department_name');
-            $table->string('status')->default('created');
+            $table->string('department_name');
+            $table->string('status')->default('Created');
             $table->timestamps();
         });
 
@@ -26,6 +26,7 @@ class CreateConsignmentsTable extends Migration
             $table->string('VSSLPR');
             $table->string('name');
             $table->integer('amount');
+            $table->float('price');
             $table->timestamps();
             $table->foreign('consignment_id')->references('id')->on('consignments')->onDelete('cascade');
         });
