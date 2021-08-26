@@ -15,6 +15,16 @@ use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 class ConsignmentController extends Controller
 {
     /**
+         * Display a listing of the resource.
+         *
+         * @return Consignment[]|Collection
+         */
+    public function index(): Collection|array
+    {
+        return Consignment::all();
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param Request $request

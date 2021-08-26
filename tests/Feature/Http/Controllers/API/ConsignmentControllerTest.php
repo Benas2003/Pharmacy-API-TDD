@@ -135,4 +135,29 @@ class ConsignmentControllerTest extends TestCase
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
+
+    public function test_can_show_products(): void
+    {
+        $loginResponse = $this->post(route('login'), [
+            'email' => self::ADMIN_EMAIL,
+            'password' => self::ADMIN_PASSWORD,
+            'password_confirmation' => self::ADMIN_PASSWORD,
+        ]);
+        $adminToken = $loginResponse->json('token');
+
+        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->get(route('consignments.index'))
+            ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
+                "*"=>[
+                    "id",
+                    "department_name",
+                    "status",
+                    "created_at",
+                    "updated_at"
+                ]
+            ]);
+
+        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
+    }
 }
