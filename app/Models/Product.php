@@ -14,6 +14,5 @@ class Product extends Model
         'amount',
         'storage_amount',
         'price',
-        'status',
     ];
 }

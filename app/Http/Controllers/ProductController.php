@@ -66,10 +66,6 @@ class ProductController extends Controller
             'amount'=>'required|numeric|gte:0',
             'storage_amount'=>'required|numeric|gt:0',
             'price'=>'required|numeric|gt:0',
-            'status'=>[
-                'required',
-                Rule::in(['Active', 'Inactive']),
-            ],
         ]);
 
         $product = Product::find($id);
