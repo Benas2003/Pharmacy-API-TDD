@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
@@ -40,5 +41,7 @@ class DatabaseSeeder extends Seeder
         $admin->assignRole($role1);
         $pharmacist->assignRole($role2);
         $department->assignRole($role3);
+
+        Product::factory(10)->create();
     }
 }
