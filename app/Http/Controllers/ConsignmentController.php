@@ -107,6 +107,24 @@ class ConsignmentController extends Controller
         return response()->json($consignment, ResponseAlias::HTTP_OK);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $consignment = Consignment::findOrFail($id);
+
+        if($consignment->status === 'Processed')
+        {
+            return response()->json('Requested action can not be performed because consignment entered "Processed" status', ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        }
+        $consignment->delete();
+        return response()->json(null, ResponseAlias::HTTP_NO_CONTENT);
+    }
+
     private function validateAmount(mixed $requested_product): bool
     {
         return $requested_product['amount'] > 0 && is_int($requested_product['amount']) && !empty($requested_product['amount']);
