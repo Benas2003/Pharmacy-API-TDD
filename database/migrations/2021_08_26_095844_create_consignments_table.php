@@ -14,14 +14,14 @@ class CreateConsignmentsTable extends Migration
     public function up()
     {
         Schema::create('consignments', function (Blueprint $table) {
-            $table->id('id');
+            $table->increments('id');
             $table->integer('department_name');
             $table->string('status')->default('created');
             $table->timestamps();
         });
 
         Schema::create('consignment_products', function (Blueprint $table) {
-            $table->id();
+            $table->increments('id');
             $table->unsignedInteger('consignment_id');
             $table->string('VSSLPR');
             $table->string('name');
