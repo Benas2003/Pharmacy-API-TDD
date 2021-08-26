@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $role1 = Role::create(['name' => 'Administrator']);
+        $role2 = Role::create(['name' => 'Pharmacist']);
+        $role3 = Role::create(['name' => 'Department']);
     }
 }
