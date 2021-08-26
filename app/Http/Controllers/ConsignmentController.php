@@ -37,16 +37,13 @@ class ConsignmentController extends Controller
             }
 
             $existing_product = Product::findOrFail($requested_product['id']);
-            if($existing_product->amount>=$requested_product['amount'])
-            {
-                ConsignmentProduct::create([
-                    'consignment_id' => $consignment->id,
-                    'VSSLPR' => $existing_product->VSSLPR,
-                    'name' => $existing_product->name,
-                    'amount' => $requested_product['amount'],
-                    'price'=>$requested_product['amount']*$existing_product->price,
-                ]);
-            }
+            ConsignmentProduct::create([
+                'consignment_id' => $consignment->id,
+                'VSSLPR' => $existing_product->VSSLPR,
+                'name' => $existing_product->name,
+                'amount' => $requested_product['amount'],
+                'price'=>$requested_product['amount']*$existing_product->price,
+            ]);
 
         }
 
@@ -55,6 +52,25 @@ class ConsignmentController extends Controller
             "Consignment Products:"=>ConsignmentProduct::where('consignment_id', $consignment->id)->get(),
         ];
         return response()->json($data,ResponseAlias::HTTP_CREATED);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param int $id
+     * @return JsonResponse
+     */
+    public function show(int $id): JsonResponse
+    {
+        $consignment = Consignment::findOrFail($id);
+        $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
+
+        $data = [
+            'Department name' => $consignment->department_name,
+            'Status'=>$consignment->status,
+            'Products:'=>$consignment_products,
+        ];
+        return response()->json($data, ResponseAlias::HTTP_OK);
     }
 
     /**

@@ -66,9 +66,9 @@ class ConsignmentControllerTest extends TestCase
             'password' => self::PHARMACIST_PASSWORD,
             'password_confirmation' => self::PHARMACIST_PASSWORD,
         ]);
-        $adminToken = $loginResponse->json('token');
+        $pharmacistToken = $loginResponse->json('token');
 
-        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->post(route('consignments.store'), [
             1=>[
                 "id"=>2,
@@ -77,7 +77,7 @@ class ConsignmentControllerTest extends TestCase
         ])
             ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
 
-        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
@@ -110,6 +110,27 @@ class ConsignmentControllerTest extends TestCase
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->put(route('consignments.update', 2),['status'=>'Given away'])
             ->assertStatus(ResponseAlias::HTTP_OK);
+
+        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
+    }
+
+    public function test_can_show_a_product(): void
+    {
+        $loginResponse = $this->post(route('login'), [
+            'email' => self::ADMIN_EMAIL,
+            'password' => self::ADMIN_PASSWORD,
+            'password_confirmation' => self::ADMIN_PASSWORD,
+        ]);
+        $adminToken = $loginResponse->json('token');
+
+        $this->withHeader("Authorization", "Bearer $adminToken");
+        $this->get(route('consignments.show', 3))
+            ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
+                'Department name',
+                'Status',
+                'Products:'
+            ]);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
