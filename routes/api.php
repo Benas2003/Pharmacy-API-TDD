@@ -33,6 +33,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['middleware' => ['role:Administrator']], function () {
         Route::post('products', [ProductController::class, 'store'])->name('products.store');
         Route::delete('products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
+        Route::put('products/{id}', [ProductController::class, 'update'])->name('products.update');
 
         Route::delete('consignments/{id}', [ConsignmentController::class, 'destroy'])->name('consignments.destroy');
     });
@@ -40,9 +41,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Routes with Administrator and Pharmacist role
     Route::group(['middleware' => ['role:Administrator|Pharmacist']], function () {
-        Route::put('products/{id}', [ProductController::class, 'update'])->name('products.update');
-
         Route::put('consignments/{id}', [ConsignmentController::class, 'update'])->name('consignments.update');
+    });
+
+    // Routes with Pharmacist role
+    Route::group(['middleware' => ['role:Pharmacist']], function () {
+        Route::put('product/{id}/order/{order_unique_code}', [ProductController::class, 'stockUpdate'])->name('stock.update');
     });
 
 

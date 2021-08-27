@@ -8,7 +8,6 @@ use Tests\TestCase;
 
 class AuthControllerTest extends TestCase
 {
-
     public const ADMIN_EMAIL = 'Admin@icloud.com';
     public const ADMIN_PASSWORD = 'Admin';
     public const WRONG_ADMIN_PASSWORD = 'dmin';
