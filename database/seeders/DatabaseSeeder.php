@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Consignment;
+use App\Models\ConsignmentProduct;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -43,5 +45,15 @@ class DatabaseSeeder extends Seeder
         $department->assignRole($role3);
 
         Product::factory(10)->create();
+        $consignments = Consignment::factory(3)->create([
+            'status'=>'Created'
+        ]);
+
+        foreach ($consignments as $consignment)
+        {
+            ConsignmentProduct::factory(2)->create([
+                'consignment_id'=>$consignment->id
+            ]);
+        }
     }
 }
