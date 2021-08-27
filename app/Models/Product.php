@@ -8,6 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+
+    protected $table = 'products';
+
+    protected $primaryKey = 'id';
+
     protected $fillable = [
         'VSSLPR',
         'name',
@@ -15,4 +20,9 @@ class Product extends Model
         'storage_amount',
         'price',
     ];
+
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 }

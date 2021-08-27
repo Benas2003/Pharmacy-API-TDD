@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Models\Order;
 use App\Models\Product;
 use Faker\Factory;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -127,9 +128,8 @@ class ProductControllerTest extends TestCase
         $data = [
             'VSSLPR' => $faker->numerify('VSSLPR#####'),
             'name' => $faker->word,
-            'amount' => 0,
-            'storage_amount' => $faker->numberBetween($min = 1000, $max = 9000),
-            'price' => $faker->randomFloat($nbMaxDecimals = NULL, $min = 0.001, $max = 1000.00),
+            'storage_amount' => $faker->numberBetween($min = 1000, $max = 3000),
+            'price' => $faker->randomFloat($nbMaxDecimals = NULL, $min = 0.001, $max = 10.00),
         ];
 
         $this->withHeader("Authorization", "Bearer $adminToken");
@@ -141,7 +141,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_update_a_product_with_pharmacist_role(): void
+    public function test_can_not_update_a_product_with_pharmacist_role(): void
     {
         $faker = Factory::create();
 
@@ -164,8 +164,7 @@ class ProductControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->put(route('products.update', $product->id), $data)
-            ->assertStatus(ResponseAlias::HTTP_OK)
-            ->assertJson($data);
+            ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
@@ -189,4 +188,24 @@ class ProductControllerTest extends TestCase
         $this->withHeader("Authorization", "Bearer $departmentToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
+
+    public function test_can_update_product_amount_with_Pharmacist_role(): void
+    {
+        $loginResponse = $this->post(route('login'), [
+            'email' => self::PHARMACIST_EMAIL,
+            'password' => self::PHARMACIST_PASSWORD,
+            'password_confirmation' => self::PHARMACIST_PASSWORD,
+        ]);
+        $pharmacistToken = $loginResponse->json('token');
+
+        $order = Order::factory()->create();
+
+        $this->withHeader("Authorization", "Bearer $pharmacistToken");
+        $this->put(route('stock.update', [$order->product_id, $order->EUR_INT_O]))
+            ->assertStatus(ResponseAlias::HTTP_OK);
+
+        $this->withHeader("Authorization", "Bearer $pharmacistToken");
+        $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
+    }
+
 }
