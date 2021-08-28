@@ -72,6 +72,6 @@ class OrderProducts extends Command
 
     private function export()
     {
-        return Excel::download(new OrdersExport, 'orders-'.date('Y/m/d').'.xlsx');
+        return Excel::store(new OrdersExport, 'orders-'.date('Y-m-d').'.xlsx');
     }
 }
