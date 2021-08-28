@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ConsignmentController;
 use App\Http\Controllers\ConsignmentProductsController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,6 +35,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('products', [ProductController::class, 'store'])->name('products.store');
         Route::delete('products/{id}', [ProductController::class, 'destroy'])->name('products.destroy');
         Route::put('products/{id}', [ProductController::class, 'update'])->name('products.update');
+
+        Route::put('orders/{id}', [OrderController::class, 'update'])->name('orders.update');
 
         Route::delete('consignments/{id}', [ConsignmentController::class, 'destroy'])->name('consignments.destroy');
     });
