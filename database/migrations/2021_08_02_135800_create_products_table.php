@@ -15,7 +15,7 @@ class CreateProductsTable extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('VSSLPR');
+            $table->string('VSSLPR')->unique();
             $table->string('name');
             $table->integer('amount')->default('0');
             $table->integer('storage_amount');
