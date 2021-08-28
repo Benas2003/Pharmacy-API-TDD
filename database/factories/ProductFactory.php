@@ -26,7 +26,7 @@ class ProductFactory extends Factory
             'name'=> $this->faker->word,
             'amount'=>$this->faker->numberBetween($min = 1, $max = 50000),
             'storage_amount'=> $this->faker->numberBetween($min = 1000, $max = 9000),
-            'price'=> $this->faker->randomFloat($nbMaxDecimals = NULL, $min = 0, $max = 1000),
+            'price'=> $this->faker->randomFloat($nbMaxDecimals = NULL, $min = 0.0001, $max = 1000.00),
         ];
     }
 }
