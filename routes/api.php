@@ -38,15 +38,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::delete('consignments/{id}', [ConsignmentController::class, 'destroy'])->name('consignments.destroy');
     });
 
-
-    // Routes with Administrator and Pharmacist role
-    Route::group(['middleware' => ['role:Administrator|Pharmacist']], function () {
-        Route::put('consignments/{id}', [ConsignmentController::class, 'update'])->name('consignments.update');
-    });
-
     // Routes with Pharmacist role
     Route::group(['middleware' => ['role:Pharmacist']], function () {
         Route::put('product/{id}/order/{order_unique_code}', [ProductController::class, 'stockUpdate'])->name('stock.update');
+        Route::put('consignments/{id}', [ConsignmentController::class, 'update'])->name('consignments.update');
     });
 
 

@@ -5,6 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use App\Models\Product;
+use Exception;
+use Illuminate\Contracts\Container\BindingResolutionException;
+use LaravelDaily\Invoices\Classes\Party;
+use LaravelDaily\Invoices\Invoice;
+use LaravelDaily\Invoices\Classes\InvoiceItem;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -89,6 +94,8 @@ class ConsignmentController extends Controller
      * @param Request $request
      * @param int $id
      * @return JsonResponse
+     * @throws BindingResolutionException
+     * @throws Exception
      */
     public function update(Request $request, int $id): JsonResponse
     {
@@ -104,6 +111,13 @@ class ConsignmentController extends Controller
             'status'=>$request['status'],
         ]);
 
+        $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
+
+        if($request['status'] === 'Processed')
+        {
+            $invoice = $this->generateInvoice($consignment, $consignment_products);
+            $invoice->download();
+        }
         return response()->json($consignment, ResponseAlias::HTTP_OK);
     }
 
@@ -133,5 +147,38 @@ class ConsignmentController extends Controller
     private function validateId(mixed $requested_product): bool
     {
         return $requested_product['id'] > 0 && is_int($requested_product['id']) && !empty($requested_product['id']);
+    }
+
+    private function generateInvoice($consignment, $consignment_products): Invoice
+    {
+        $customer = new Party([
+            'name' => $consignment->department_name,
+            'date' => $consignment->created_at,
+        ]);
+
+        $seller = new Party([
+            'pharmacist' => Auth::user()->name,
+        ]);
+
+        foreach ($consignment_products as $product) {
+            $consignment_items[] = (new InvoiceItem())->title($product->VSSLPR . ' | ' . $product->name)->pricePerUnit($product->price / $product->amount)->quantity($product->amount);
+        }
+
+        return Invoice::make("Consignment - #$consignment->id")
+            ->series('EUR-INT-C')
+            ->sequence($consignment->id)
+            ->serialNumberFormat('{SERIES}{SEQUENCE}')
+            ->seller($seller)
+            ->buyer($customer)
+            ->dateFormat('Y/m/d')
+            ->currencySymbol('€')
+            ->currencyCode('EUR')
+            ->addItems($consignment_items)
+            ->currencyFormat('{SYMBOL}{VALUE}')
+            ->currencyThousandsSeparator("'")
+            ->currencyDecimalPoint('.')
+            ->filename('Consignment' . '-000' . $consignment->id)
+            ->logo(public_path('vendor/invoices/logo.png'))
+            ->save('public');
     }
 }

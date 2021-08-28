@@ -99,7 +99,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_update_a_consignment_with_Admin_role(): void
+    public function test_can_not_update_a_consignment_with_Admin_role(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -110,7 +110,7 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->put(route('consignments.update', 2),['status'=>'Given away'])
-            ->assertStatus(ResponseAlias::HTTP_OK);
+            ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
