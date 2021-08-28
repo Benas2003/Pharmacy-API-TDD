@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Consignment extends Model
 {
@@ -15,7 +16,7 @@ class Consignment extends Model
 
     protected $fillable = ['department_name', 'status'];
 
-    public function consignmentProducts()
+    public function consignmentProducts(): HasMany
     {
         return $this->hasMany(ConsignmentProduct::class);
     }

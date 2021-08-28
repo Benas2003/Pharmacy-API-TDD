@@ -23,12 +23,14 @@ class CreateConsignmentsTable extends Migration
         Schema::create('consignment_products', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('consignment_id');
+            $table->unsignedInteger('product_id');
             $table->string('VSSLPR');
             $table->string('name');
             $table->integer('amount');
             $table->float('price');
             $table->timestamps();
             $table->foreign('consignment_id')->references('id')->on('consignments')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
         });
     }
 
