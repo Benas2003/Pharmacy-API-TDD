@@ -25,6 +25,7 @@ class ConsignmentProductFactory extends Factory
         $product = Product::factory()->create();
         return [
             'VSSLPR'=>$product->VSSLPR,
+            'product_id'=>$product->id,
             'name'=>$product->name,
             'amount'=> $amount = $this->faker->randomFloat($nbMaxDecimals = NULL, $min = 0.0001, $max = 1000.00),
             'price' => $amount*$product->price,

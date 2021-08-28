@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Consignment;
+use App\Models\ConsignmentProduct;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
@@ -84,6 +85,13 @@ class ConsignmentControllerTest extends TestCase
 
     public function test_can_update_a_consignment_with_Pharmacist_role(): void
     {
+        $consignment = Consignment::factory()->create([
+            'status'=>'Created'
+        ]);
+        ConsignmentProduct::factory(2)->create([
+            'consignment_id'=>$consignment->id,
+        ]);
+
         $loginResponse = $this->post(route('login'), [
             'email' => self::PHARMACIST_EMAIL,
             'password' => self::PHARMACIST_PASSWORD,
@@ -92,7 +100,7 @@ class ConsignmentControllerTest extends TestCase
         $pharmacistToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
-        $this->put(route('consignments.update', 2),['status'=>'Processed'])
+        $this->put(route('consignments.update', $consignment->id),['status'=>'Processed'])
             ->assertStatus(ResponseAlias::HTTP_OK);
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");

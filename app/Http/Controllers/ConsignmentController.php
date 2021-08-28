@@ -54,6 +54,7 @@ class ConsignmentController extends Controller
             $existing_product = Product::findOrFail($requested_product['id']);
             ConsignmentProduct::create([
                 'consignment_id' => $consignment->id,
+                'product_id' => $existing_product->id,
                 'VSSLPR' => $existing_product->VSSLPR,
                 'name' => $existing_product->name,
                 'amount' => $requested_product['amount'],
@@ -107,17 +108,50 @@ class ConsignmentController extends Controller
         ]);
 
         $consignment = Consignment::findOrFail($id);
+
+
+        if($request['status'] === 'Processed')
+        {
+            $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
+            foreach ($consignment_products as $consignment_product)
+            {
+                $storage_product = Product::findOrFail($consignment_product->product_id);
+
+                if($storage_product->amount === 0)
+                {
+                    return response()->json("Requested amount can not be given away because $storage_product->name amount in storage equals 0", ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+                }
+
+            }
+
+            foreach ($consignment_products as $consignment_product)
+            {
+
+                $storage_product = Product::findOrFail($consignment_product->product_id);
+
+                if($storage_product->amount>=$consignment_product->amount)
+                {
+                    $storage_product->update([
+                        'amount'=>$storage_product->amount-$consignment_product->amount,
+                    ]);
+                }else {
+                    $consignment_product->update([
+                        'amount'=>$storage_product->amount
+                    ]);
+                    $storage_product->update([
+                        'amount'=>0
+                    ]);
+                }
+
+            }
+            $invoice = $this->generateInvoice($consignment, $consignment_products);
+            $invoice->download();
+        }
+
         $consignment->update([
             'status'=>$request['status'],
         ]);
 
-        $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
-
-        if($request['status'] === 'Processed')
-        {
-            $invoice = $this->generateInvoice($consignment, $consignment_products);
-            $invoice->download();
-        }
         return response()->json($consignment, ResponseAlias::HTTP_OK);
     }
 

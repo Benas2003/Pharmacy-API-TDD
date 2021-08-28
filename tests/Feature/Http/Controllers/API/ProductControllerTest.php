@@ -11,7 +11,6 @@ use Tests\TestCase;
 
 class ProductControllerTest extends TestCase
 {
-
     public const ADMIN_EMAIL = 'Admin@icloud.com';
     public const ADMIN_PASSWORD = 'Admin';
 
@@ -207,5 +206,4 @@ class ProductControllerTest extends TestCase
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
-
 }
