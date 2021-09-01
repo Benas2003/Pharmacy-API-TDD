@@ -199,6 +199,7 @@ class ConsignmentController extends Controller
         }
 
         return Invoice::make("Consignment - #$consignment->id")
+            ->template('consignment_template')
             ->series('EUR-INT-C')
             ->sequence($consignment->id)
             ->serialNumberFormat('{SERIES}{SEQUENCE}')
