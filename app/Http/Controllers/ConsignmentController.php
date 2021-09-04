@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use App\Models\Product;
+use App\Models\User;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use LaravelDaily\Invoices\Classes\Party;
@@ -40,7 +41,7 @@ class ConsignmentController extends Controller
         $requested_products = $request->toArray();
 
         $consignment = Consignment::create([
-            'department_name'=>Auth::user()->name,
+            'department_id'=>Auth::user()->id,
 
         ]);
 
@@ -82,7 +83,7 @@ class ConsignmentController extends Controller
         $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
 
         $data = [
-            'Department name' => $consignment->department_name,
+            'Department name' => User::select('name')->where('id', $consignment->department_id)->get(),
             'Status'=>$consignment->status,
             'Products:'=>$consignment_products,
         ];
@@ -186,7 +187,7 @@ class ConsignmentController extends Controller
     private function generateInvoice($consignment, $consignment_products): Invoice
     {
         $customer = new Party([
-            'name' => $consignment->department_name,
+            'name' => User::select('name')->where('id', $consignment->department_id)->get(),
             'date' => $consignment->created_at,
         ]);
 

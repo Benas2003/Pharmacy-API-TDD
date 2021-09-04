@@ -15,9 +15,10 @@ class CreateConsignmentsTable extends Migration
     {
         Schema::create('consignments', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('department_name');
+            $table->unsignedInteger('department_id');
             $table->string('status')->default('Created');
             $table->timestamps();
+            $table->foreign('department_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('consignment_products', function (Blueprint $table) {

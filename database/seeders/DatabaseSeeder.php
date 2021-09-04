@@ -46,6 +46,7 @@ class DatabaseSeeder extends Seeder
 
         Product::factory(10)->create();
         $consignments = Consignment::factory(3)->create([
+            'department_id'=>$department->id,
             'status'=>'Created'
         ]);
 
