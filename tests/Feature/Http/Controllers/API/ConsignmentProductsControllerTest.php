@@ -4,6 +4,7 @@ namespace Tests\Feature\Http\Controllers\API;
 
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
@@ -13,12 +14,14 @@ class ConsignmentProductsControllerTest extends TestCase
     public const ADMIN_EMAIL = 'Admin@icloud.com';
     public const ADMIN_PASSWORD = 'Admin';
 
+    public const DEPARTMENT_USER_ID = 3;
     public const DEPARTMENT_EMAIL = 'cr@icloud.com';
     public const DEPARTMENT_PASSWORD = 'CR91';
 
     public function test_can_update_product_amount_in_Created_consignment_with_Department_role():void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Created',
         ]);
         $consignment_product = ConsignmentProduct::factory()->create([
@@ -40,7 +43,8 @@ class ConsignmentProductsControllerTest extends TestCase
     public function test_can_not_update_product_amount_in_Processed_consignment_with_Department_role():void
     {
         $consignment = Consignment::factory()->create([
-        'status'=>'Processed',
+            'department_id'=>self::DEPARTMENT_USER_ID,
+            'status'=>'Processed',
         ]);
         $consignment_product = ConsignmentProduct::factory()->create([
         'consignment_id'=>$consignment->id,
@@ -61,6 +65,7 @@ class ConsignmentProductsControllerTest extends TestCase
     public function test_can_not_update_product_amount_in_Given_away_consignment_with_Department_role():void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Given away',
         ]);
         $consignment_product = ConsignmentProduct::factory()->create([
@@ -82,6 +87,7 @@ class ConsignmentProductsControllerTest extends TestCase
     public function test_can_not_update_product_amount_in_Created_consignment_with_Administrator_role():void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Given away',
         ]);
         $consignment_product = ConsignmentProduct::factory()->create([

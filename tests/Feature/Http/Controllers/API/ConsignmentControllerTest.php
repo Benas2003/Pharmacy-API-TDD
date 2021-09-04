@@ -15,8 +15,10 @@ class ConsignmentControllerTest extends TestCase
     public const PHARMACIST_EMAIL = 'jonas.jonaitis@icloud.com';
     public const PHARMACIST_PASSWORD = 'JJKK';
 
+    public const DEPARTMENT_USER_ID = 3;
     public const DEPARTMENT_EMAIL = 'cr@icloud.com';
     public const DEPARTMENT_PASSWORD = 'CR91';
+
 
     public function test_can_create_a_consignment_with_Department_role(): void
     {
@@ -86,6 +88,7 @@ class ConsignmentControllerTest extends TestCase
     public function test_can_update_a_consignment_with_Pharmacist_role(): void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Created'
         ]);
         ConsignmentProduct::factory(2)->create([
@@ -134,7 +137,7 @@ class ConsignmentControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->get(route('consignments.show', 3))
+        $this->get(route('consignments.show', self::DEPARTMENT_USER_ID))
             ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
                 'Department name',
                 'Status',
@@ -159,7 +162,7 @@ class ConsignmentControllerTest extends TestCase
             ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
                 "*"=>[
                     "id",
-                    "department_name",
+                    "department_id",
                     "status",
                     "created_at",
                     "updated_at"
@@ -174,6 +177,7 @@ class ConsignmentControllerTest extends TestCase
     {
 
         $consignment = Consignment::factory()->create([
+            'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Created'
         ]);
 
@@ -195,6 +199,7 @@ class ConsignmentControllerTest extends TestCase
     public function test_can_delete_products_with_Given_away_status(): void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Given away'
         ]);
 
@@ -216,6 +221,7 @@ class ConsignmentControllerTest extends TestCase
     public function test_can_not_delete_products_with_Processed_status(): void
     {
         $consignment = Consignment::factory()->create([
+            'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Processed'
         ]);
 

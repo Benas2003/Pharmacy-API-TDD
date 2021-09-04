@@ -22,7 +22,6 @@ class ConsignmentFactory extends Factory
     public function definition()
     {
         return [
-            'department_name'=> $this->faker->numerify('LSMULKK###'),
             'status' => array_rand(['Created', 'Processed', 'Given away']),
         ];
     }
