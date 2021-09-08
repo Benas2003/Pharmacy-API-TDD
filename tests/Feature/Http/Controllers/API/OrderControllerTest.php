@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Domain\Order\Exceptions\DeliveredOrderStatusException;
 use App\Models\Order;
 use Tests\TestCase;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -31,10 +32,8 @@ class OrderControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->put(route('orders.update', [
-            'id'=>$order->id,
-            'amount'=>100,
-        ]))->assertStatus(ResponseAlias::HTTP_OK);
+        $this->put(route('orders.update', [$order->id, 200]))
+            ->assertStatus(ResponseAlias::HTTP_OK);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
@@ -88,6 +87,10 @@ class OrderControllerTest extends TestCase
 
     public function test_can_not_update_order_amount_with_Admin_role_and_Delivered_status(): void
     {
+
+        $this->withoutExceptionHandling();
+        $this->expectException(DeliveredOrderStatusException::class);
+
         $order=Order::factory()->create([
             'status'=>'Delivered',
         ]);
@@ -100,10 +103,7 @@ class OrderControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->put(route('orders.update', [
-            'id'=>$order->id,
-            'amount'=>100,
-        ]))->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $this->put(route('orders.update', ['id'=>$order->id,'amount'=>100,]));
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
