@@ -2,44 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
+use App\Domain\Product\Repository\ProductRepository;
+use App\Domain\Product\Services\searchService;
+use App\Domain\Product\Services\stockUpdateService;
+use App\Domain\Product\UseCase\CreateProductUseCase;
+use App\Domain\Product\UseCase\DestroyProductUseCase;
+use App\Domain\Product\UseCase\UpdateProductUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use App\Models\Product;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
-use Prophecy\Doubler\Generator\Node\ArgumentNode;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Database\Eloquent\Collection|Product[]
+     * @return JsonResponse
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Product::all();
+        $productRepository = new ProductRepository();
+        return $productRepository->getAllProducts();
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @return JsonResponse
      */
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
-        $request->validate([
-            'VSSLPR'=>'required|starts_with:VSSLPR',
-            'name'=>'required',
-            'storage_amount'=>'required|numeric|gt:0',
-            'price'=>'required|numeric|gt:0',
-        ]);
-
-        $product = Product::create($request->all());
-        return response()->json($product,201);
+        $createProductUseCase = new CreateProductUseCase($request);
+        return $createProductUseCase->execute();
     }
 
     /**
@@ -48,31 +42,23 @@ class ProductController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function show($id)
+    public function show(int $id): JsonResponse
     {
-        $product = Product::find($id);
-        return response()->json($product, 200);
+        $productRepository = new ProductRepository();
+        return $productRepository->getProductById($id);
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param Request $request
      * @param  int  $id
      * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, int $id): JsonResponse
     {
-        $request->validate([
-            'VSSLPR'=>'required|starts_with:VSSLPR',
-            'name'=>'required',
-            'storage_amount'=>'required|numeric|gt:0',
-            'price'=>'required|numeric|gt:0',
-        ]);
-
-        $product = Product::find($id);
-        $product->update($request->all());
-        return response()->json($product, 200);
+        $updateProductUseCase = new UpdateProductUseCase($request);
+        return $updateProductUseCase->execute($id);
     }
 
     /**
@@ -81,44 +67,33 @@ class ProductController extends Controller
      * @param  int  $id
      * @return JsonResponse
      */
-    public function destroy($id)
+    public function destroy(int $id): JsonResponse
     {
-        Product::destroy($id);
-        return response()->json(null, 204);
+        $destroyProductUseCase = new DestroyProductUseCase();
+        return $destroyProductUseCase->execute($id);
     }
 
     /**
      * Search for a name.
      *
      * @param  string  $name
-     * @return Response
+     * @return JsonResponse
      */
-    public function search($name): Response
+    public function search(string $name): JsonResponse
     {
-
-        return Product::where('name', 'like', '%'.$name.'%')->get();
+        $searchService = new searchService();
+        return $searchService->searchByName($name);
     }
 
     /**
      * Update product stock
      *
      * @param  int  $id
-     * @param  string  $order_unique_code
-     * @return JsonResponse
+     * @param  int  $amount
      */
-    public function stockUpdate(int $id, string $order_unique_code): JsonResponse
+    public function stockUpdate(int $id, int $amount): void
     {
-        $product = Product::findOrFail($id);
-        $order = Order::where('EUR_INT_O', $order_unique_code)->get()->first();
-
-        $product->update([
-            'amount'=>$product->amount+$order->amount,
-        ]);
-
-        $order->update([
-            'status'=>'Delivered',
-        ]);
-
-        return response()->json($product, 200);
+        $stockUpdateService = new stockUpdateService();
+        $stockUpdateService->execute($id, $amount);
     }
 }

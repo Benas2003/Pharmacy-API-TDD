@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Consignment\UseCase\UpdateConsignmentProductUseCase;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use Illuminate\Http\JsonResponse;
@@ -19,21 +20,7 @@ class ConsignmentProductsController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $request->validate([
-            'amount'=>'required|numeric|gt:0',
-        ]);
-
-        $product = ConsignmentProduct::findOrFail($id);
-        $consignment = Consignment::find($product->consignment_id);
-
-        if($consignment->status === 'Created')
-        {
-            $product->update(['amount'=>$request['amount']]);
-            return response()->json($product, ResponseAlias::HTTP_OK);
-        }
-
-        return response()->json('Requested amount change can not be performed when consignment enters "Processed" status', ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
-
-
+        $updateConsignmentProductUseCase = new UpdateConsignmentProductUseCase($request);
+        return $updateConsignmentProductUseCase->execute($id);
     }
 }

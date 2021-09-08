@@ -20,15 +20,12 @@ class ConsignmentProductFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
-        $product = Product::factory()->create();
-        return [
-            'VSSLPR'=>$product->VSSLPR,
-            'product_id'=>$product->id,
-            'name'=>$product->name,
-            'amount'=> $amount = $this->faker->randomFloat($nbMaxDecimals = NULL, $min = 0.0001, $max = 1000.00),
-            'price' => $amount*$product->price,
-        ];
+        $productFactory = new \App\Domain\Product\Factory\ProductFactory();
+        $product = Product::create($productFactory->fakeProduct());
+
+        $consignmentProductFactory = new \App\Domain\Consignment\Factory\ConsignmentProductFactory();
+        return $consignmentProductFactory->fakeConsignmentProduct($product);
     }
 }

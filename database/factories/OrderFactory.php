@@ -20,16 +20,12 @@ class OrderFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
-        $product = Product::factory()->create();
-        $ordering_amount = $product->storage_amount-$product->amount;
-        return [
-            'product_id'=>$product->id,
-            'EUR_INT_O'=>$this->faker->uuid,
-            'name' => $product->name,
-            'amount' => $ordering_amount,
-            'price'=> $product->price*$ordering_amount,
-        ];
+        $productFactory = new \App\Domain\Product\Factory\ProductFactory();
+        $product = Product::create($productFactory->fakeProduct());
+
+        $orderFactory = new \App\Domain\Order\Factory\OrderFactory();
+        return $orderFactory->fakeOrder($product);
     }
 }

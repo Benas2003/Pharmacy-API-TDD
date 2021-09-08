@@ -200,7 +200,7 @@ class ProductControllerTest extends TestCase
         $order = Order::factory()->create();
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
-        $this->put(route('stock.update', [$order->product_id, $order->EUR_INT_O]))
+        $this->put(route('stock.update', [$order->id, 100]))
             ->assertStatus(ResponseAlias::HTTP_OK);
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");

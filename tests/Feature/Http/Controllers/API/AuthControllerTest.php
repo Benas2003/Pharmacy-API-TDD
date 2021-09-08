@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Domain\User\Exceptions\InvalidCredentialsInputException;
 use App\Models\User;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
@@ -56,7 +57,7 @@ class AuthControllerTest extends TestCase
             'password' => self::ADMIN_PASSWORD,
             'password_confirmation' => self::ADMIN_PASSWORD,
         ])
-            ->assertStatus(ResponseAlias::HTTP_CREATED);
+            ->assertStatus(ResponseAlias::HTTP_OK);
 
         $response->assertJsonStructure([
             'user' => [
@@ -76,28 +77,26 @@ class AuthControllerTest extends TestCase
 
     public function test_user_can_not_login_with_wrong_email(): void
     {
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidCredentialsInputException::class);
+
         $this->post(route('login'), [
             'email' => self::WRONG_ADMIN_EMAIL,
             'password' => self::ADMIN_PASSWORD,
             'password_confirmation' => self::ADMIN_PASSWORD,
-        ])
-            ->assertStatus(ResponseAlias::HTTP_UNAUTHORIZED)
-            ->assertExactJson([
-                'message' => 'Bad data'
-            ]);
+        ]);
     }
 
     public function test_user_can_not_login_with_wrong_password(): void
     {
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidCredentialsInputException::class);
+
         $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
             'password' => self::WRONG_ADMIN_PASSWORD,
             'password_confirmation' => self::WRONG_ADMIN_PASSWORD,
-        ])
-            ->assertStatus(ResponseAlias::HTTP_UNAUTHORIZED)
-            ->assertExactJson([
-                'message' => 'Bad data'
-            ]);
+        ]);
     }
 
     public function test_user_can_logout(): void

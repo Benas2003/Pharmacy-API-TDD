@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Domain\Consignment\Exceptions\InvalidStatusException;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
-use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 use Tests\TestCase;
 
@@ -42,6 +42,9 @@ class ConsignmentProductsControllerTest extends TestCase
 
     public function test_can_not_update_product_amount_in_Processed_consignment_with_Department_role():void
     {
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidStatusException::class);
+
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Processed',
@@ -64,6 +67,9 @@ class ConsignmentProductsControllerTest extends TestCase
 
     public function test_can_not_update_product_amount_in_Given_away_consignment_with_Department_role():void
     {
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidStatusException::class);
+
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Given away',

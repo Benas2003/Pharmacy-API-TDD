@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers\API;
 
+use App\Domain\Consignment\Exceptions\InvalidConsignmentStatusException;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
@@ -139,7 +140,6 @@ class ConsignmentControllerTest extends TestCase
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->get(route('consignments.show', self::DEPARTMENT_USER_ID))
             ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
-                'Department name',
                 'Status',
                 'Products:'
             ]);
@@ -196,8 +196,11 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_delete_products_with_Given_away_status(): void
+    public function test_can_not_delete_products_with_Given_away_status(): void
     {
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidConsignmentStatusException::class);
+
         $consignment = Consignment::factory()->create([
             'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Given away'
@@ -212,7 +215,7 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->delete(route('consignments.destroy', $consignment->id))
-            ->assertStatus(ResponseAlias::HTTP_NO_CONTENT)->assertNoContent();
+            ->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
@@ -220,6 +223,10 @@ class ConsignmentControllerTest extends TestCase
 
     public function test_can_not_delete_products_with_Processed_status(): void
     {
+
+        $this->withoutExceptionHandling();
+        $this->expectException(InvalidConsignmentStatusException::class);
+
         $consignment = Consignment::factory()->create([
             'department_id'=> self::DEPARTMENT_USER_ID,
             'status'=>'Processed'

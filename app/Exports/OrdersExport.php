@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Models\Order;
+use App\Domain\Order\Repository\OrderRepository;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
@@ -13,6 +13,9 @@ class OrdersExport implements FromCollection
     */
     public function collection(): Collection
     {
+        $orderRepository = new OrderRepository();
+
+
         $title = [
             'id'=>'Order ID',
             'EUR_INT_O'=>'EUR-INT-O Serial No.',
@@ -22,7 +25,7 @@ class OrdersExport implements FromCollection
             'created_at'=>'Order created at'
         ];
 
-        $orders = Order::select('id', 'EUR_INT_O', 'name', 'amount', 'price', 'created_at')->where('status', 'Ordered')->where('created_at','like', date('Y-m-d').'%')->get();
+        $orders = $orderRepository->getAllOrdersFromSpecificRows();
         $orders->prepend($title);
         return $orders;
     }

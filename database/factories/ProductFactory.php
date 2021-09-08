@@ -19,14 +19,9 @@ class ProductFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
-        return [
-            'VSSLPR'=> $this->faker->numerify('VSSLPR#####'),
-            'name'=> $this->faker->word,
-            'amount'=>$this->faker->numberBetween($min = 1, $max = 10000),
-            'storage_amount'=> $this->faker->numberBetween($min = 1000, $max = 20000),
-            'price'=> $this->faker->randomFloat($nbMaxDecimals = NULL, $min = 0.0001, $max = 5.00),
-        ];
+        $productFactory = new \App\Domain\Product\Factory\ProductFactory();
+        return $productFactory->fakeProduct();
     }
 }
