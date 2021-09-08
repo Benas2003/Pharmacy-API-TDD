@@ -19,10 +19,9 @@ class ConsignmentFactory extends Factory
      *
      * @return array
      */
-    public function definition()
+    public function definition(): array
     {
-        return [
-            'status' => array_rand(['Created', 'Processed', 'Given away']),
-        ];
+        $consignmentFactory = new \App\Domain\Consignment\Factory\ConsignmentFactory();
+        return $consignmentFactory->fakeConsignment();
     }
 }
