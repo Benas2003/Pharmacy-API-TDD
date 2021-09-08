@@ -6,7 +6,6 @@ use App\Domain\Product\Exceptions\InvalidNameInputException;
 use App\Domain\Product\Exceptions\InvalidPriceInputException;
 use App\Domain\Product\Exceptions\InvalidStorageAmountInputException;
 use App\Domain\Product\Exceptions\InvalidVSSLPRInputException;
-use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -50,21 +49,21 @@ class ProductValidator
         ]);
     }
 
-    private function nameValidator(Request $request): \Illuminate\Contracts\Validation\Validator
+    protected function nameValidator(Request $request): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($request->all(), [
             'name' => 'required',
         ]);
     }
 
-    private function storageAmountValidator(Request $request): \Illuminate\Contracts\Validation\Validator
+    protected function storageAmountValidator(Request $request): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($request->all(), [
             'storage_amount' => 'required|numeric|gt:0',
         ]);
     }
 
-    private function priceValidator(Request $request): \Illuminate\Contracts\Validation\Validator
+    protected function priceValidator(Request $request): \Illuminate\Contracts\Validation\Validator
     {
         return Validator::make($request->all(), [
             'price' => 'required|numeric|gt:0',
