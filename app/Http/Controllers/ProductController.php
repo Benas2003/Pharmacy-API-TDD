@@ -82,8 +82,7 @@ class ProductController extends Controller
     public function search(string $name): JsonResponse
     {
         $searchService = new searchService();
-
-        return $searchService->execute($name);
+        return $searchService->searchByName($name);
     }
 
     /**

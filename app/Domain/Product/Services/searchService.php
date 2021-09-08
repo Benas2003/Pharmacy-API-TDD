@@ -7,8 +7,13 @@ use Illuminate\Http\JsonResponse;
 
 class searchService
 {
-    public function execute(string $name): JsonResponse
+    public function searchByName(string $name): JsonResponse
     {
         return new JsonResponse(Product::where('name', 'like', '%'.$name.'%')->get());
+    }
+
+    public function searchByCode(string $code): JsonResponse
+    {
+        return new JsonResponse(Product::select('id', 'VSSLPR', 'name')->where('VSSLPR', 'like', '%'.$code.'%')->get());
     }
 }
