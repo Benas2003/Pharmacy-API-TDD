@@ -20,15 +20,14 @@ class ConsignmentValidator
         }
     }
 
+    public function validateConsignmentProductAmount(Request $request): void
+    {
+        $amountValidator = $this->amountValidator($request);
 
-//    public function validateConsignmentProductAmount(Request $request): void
-//    {
-//        $amountValidator = $this->amountValidator($request);
-//
-//        if ($amountValidator->fails()) {
-//            throw new InvalidAmountInputException();
-//        }
-//    }
+        if ($amountValidator->fails()) {
+            throw new InvalidAmountInputException();
+        }
+    }
 
 
     public function validateAmount(mixed $requested_product): bool
@@ -52,10 +51,10 @@ class ConsignmentValidator
         ]);
     }
 
-//    protected function amountValidator(Request $request): \Illuminate\Contracts\Validation\Validator
-//    {
-//        return Validator::make($request->all(), [
-//
-//        ]);
-//    }
+    protected function amountValidator(Request $request): \Illuminate\Contracts\Validation\Validator
+    {
+        return Validator::make($request->all(), [
+            'amount'=>'required|numeric|gt:0',
+        ]);
+    }
 }
