@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Product\Repository\ProductRepository;
+use App\Domain\Product\Infrastructure\Database\ProductDatabase;
 use App\Domain\Product\Services\searchService;
 use App\Domain\Product\Services\stockUpdateService;
 use App\Domain\Product\UseCase\CreateProductUseCase;
@@ -20,7 +20,7 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $productRepository = new ProductRepository();
+        $productRepository = new ProductDatabase();
         return $productRepository->getAllProducts();
     }
 
@@ -44,7 +44,7 @@ class ProductController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $productRepository = new ProductRepository();
+        $productRepository = new ProductDatabase();
         return $productRepository->getProductById($id);
     }
 

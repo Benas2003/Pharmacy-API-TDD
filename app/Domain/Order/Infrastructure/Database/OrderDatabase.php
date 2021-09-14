@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Domain\Order\Repository;
+namespace App\Domain\Order\Infrastructure\Database;
 
 use App\Models\Order;
 
-class OrderRepository
+class OrderDatabase
 {
     public function getAllOrdersFromSpecificRows()
     {

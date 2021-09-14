@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Consignment\Repository\ConsignmentRepository;
+use App\Domain\Consignment\Infrastructure\Database\ConsignmentDatabase;
 use App\Domain\Consignment\UseCase\CreateConsignmentUseCase;
 use App\Domain\Consignment\UseCase\DestroyConsignmentUseCase;
 use App\Domain\Consignment\UseCase\UpdateConsignmentUseCase;
@@ -20,7 +20,7 @@ class ConsignmentController extends Controller
      */
     public function index(): JsonResponse
     {
-        $consignmentRepository = new ConsignmentRepository();
+        $consignmentRepository = new ConsignmentDatabase();
         return $consignmentRepository->getAllProducts();
     }
 
@@ -44,7 +44,7 @@ class ConsignmentController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $consignmentRepository = new ConsignmentRepository();
+        $consignmentRepository = new ConsignmentDatabase();
         return $consignmentRepository->getProductById($id);
     }
 
