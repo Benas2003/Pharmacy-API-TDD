@@ -3,8 +3,8 @@
 namespace App\Domain\User\UseCase;
 
 use App\Domain\User\Exceptions\InvalidCredentialsInputException;
+use App\Domain\User\Validator\LoginValidator;
 use App\Domain\User\Validator\NotEqual;
-use App\Domain\User\Validator\UserValidator;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -21,7 +21,7 @@ class LoginUseCase
 
     public function execute(): JsonResponse
     {
-        $userValidator = new UserValidator();
+        $userValidator = new LoginValidator();
         $passwordValidator = new NotEqual();
         $userValidator->validateLoginInputs($this->request);
 
