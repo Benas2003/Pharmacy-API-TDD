@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Domain\Order\Repository\OrderRepository;
+use App\Domain\Order\Infrastructure\Database\OrderDatabase;
 use App\Exports\OrdersExport;
 use App\Models\Order;
 use App\Models\Product;
@@ -41,7 +41,7 @@ class OrderProducts extends Command
     {
 
         $products = Product::all();
-        $orderRepository = new OrderRepository();
+        $orderRepository = new OrderDatabase();
 
         foreach ($products as $product)
         {
@@ -60,7 +60,7 @@ class OrderProducts extends Command
 
     }
 
-    private function export(): bool
+    private function export()
     {
         return Excel::store(new OrdersExport, 'orders-'.date('Y-m-d').'.xlsx');
     }

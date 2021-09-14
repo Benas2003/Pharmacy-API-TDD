@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Domain\Product\Repository;
+namespace App\Domain\Product\Infrastructure\Database;
 
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 
-class ProductRepository
+class ProductDatabase
 {
     public function getAllProducts(): JsonResponse
     {

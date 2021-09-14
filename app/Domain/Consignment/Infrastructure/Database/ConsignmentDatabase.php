@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Domain\Consignment\Repository;
+namespace App\Domain\Consignment\Infrastructure\Database;
 
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use Illuminate\Http\JsonResponse;
 
-class ConsignmentRepository
+class ConsignmentDatabase
 {
     public function getAllProducts(): JsonResponse
     {
