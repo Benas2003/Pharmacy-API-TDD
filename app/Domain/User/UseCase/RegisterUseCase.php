@@ -2,7 +2,7 @@
 
 namespace App\Domain\User\UseCase;
 
-use App\Domain\User\Validator\UserValidator;
+use App\Domain\User\Validator\RegisterValidator;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,7 +19,7 @@ class RegisterUseCase
 
     public function execute(): JsonResponse
     {
-        $registerValidator = new UserValidator();
+        $registerValidator = new RegisterValidator();
         $registerValidator->validateRegisterInputs($this->request);
 
         $user = User::create([

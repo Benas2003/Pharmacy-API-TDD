@@ -23,35 +23,29 @@ class UpdateConsignmentUseCase
         $this->request = $request;
     }
 
-
     /**
      * @throws Exception
      */
     public function execute($id): JsonResponse
     {
-
         $consignmentValidator = new ConsignmentValidator();
+
         $consignmentValidator->validateStatus($this->request);
 
-        $generateInvoiceService = new generateInvoiceService();
 
         $consignment = Consignment::findOrFail($id);
 
         if($this->request['status'] === 'Processed')
         {
-            $consignment_products = ConsignmentProduct::where('consignment_id',$id)->get();
-            $this->checkIfAmountIsEnough($consignment_products);
+            $consignment_products = $this->getConsignmentProducts($id);
 
             foreach ($consignment_products as $consignment_product)
             {
-
                 $storage_product = Product::findOrFail($consignment_product->product_id);
                 $this->checkHowMuchAmountCanBeGivenAway($storage_product, $consignment_product);
-
             }
 
-            $invoice = $generateInvoiceService->generateInvoice($consignment, $consignment_products);
-            $invoice->download();
+            $this->InvoiceService($consignment, $consignment_products);
         }
 
         $consignment->update([
@@ -86,5 +80,23 @@ class UpdateConsignmentUseCase
                 'amount' => 0
             ]);
         }
+    }
+
+    private function getConsignmentProducts($id)
+    {
+        $consignment_products = ConsignmentProduct::where('consignment_id', $id)->get();
+        $this->checkIfAmountIsEnough($consignment_products);
+        return $consignment_products;
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function InvoiceService($consignment, $consignment_products): void
+    {
+        $generateInvoiceService = new generateInvoiceService();
+
+        $invoice = $generateInvoiceService->generateInvoice($consignment, $consignment_products);
+        $invoice->download();
     }
 }
