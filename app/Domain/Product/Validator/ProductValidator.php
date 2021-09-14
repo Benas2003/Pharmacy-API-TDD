@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Validator;
 class ProductValidator
 {
 
-
     public function validateInputs(Request $request): void
     {
         $vsslprValidator = $this->vsslprValidator($request);
@@ -43,7 +42,6 @@ class ProductValidator
 
     protected function vsslprValidator(Request $request): \Illuminate\Contracts\Validation\Validator
     {
-
         return Validator::make($request->all(), [
             'VSSLPR' => 'required|starts_with:VSSLPR',
         ]);

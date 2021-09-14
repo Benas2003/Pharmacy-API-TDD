@@ -21,7 +21,7 @@ class ProductFactory extends Factory
      */
     public function definition(): array
     {
-        $productFactory = new \App\Domain\Product\Factory\ProductFactory();
+        $productFactory = new \App\Domain\Product\Factory\ProductFactory(\Faker\Factory::create());
         return $productFactory->fakeProduct();
     }
 }

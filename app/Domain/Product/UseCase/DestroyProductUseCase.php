@@ -2,19 +2,14 @@
 
 namespace App\Domain\Product\UseCase;
 
-use App\Domain\Product\Validator\ProductValidator;
+use App\Domain\Product\DTO\DestroyProductUseCaseDTO\DestroyProductInput;
 use App\Models\Product;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class DestroyProductUseCase
 {
-    public function execute(int $id): JsonResponse
+    public function execute(DestroyProductInput $destroyProductInput): void
     {
-        Product::destroy($id);
-
-        return new JsonResponse(null, ResponseAlias::HTTP_NO_CONTENT);
+        Product::destroy($destroyProductInput->getId());
     }
 
 }

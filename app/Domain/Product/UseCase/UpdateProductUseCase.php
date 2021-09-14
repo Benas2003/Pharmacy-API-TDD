@@ -2,28 +2,17 @@
 
 namespace App\Domain\Product\UseCase;
 
-use App\Domain\Product\Validator\ProductValidator;
+use App\Domain\Product\DTO\UpdateProductUseCaseDTO\UpdateProductInput;
+use App\Domain\Product\DTO\UpdateProductUseCaseDTO\UpdateProductOutput;
 use App\Models\Product;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class UpdateProductUseCase
 {
-    private Request $request;
-
-    public function __construct(Request $request)
+    public function execute(UpdateProductInput $updateProductInput): UpdateProductOutput
     {
-        $this->request = $request;
-    }
+        $product = Product::findOrFail($updateProductInput->getId());
+        $product->update($updateProductInput->getProduct()->toArray());
 
-    public function execute(int $id): JsonResponse
-    {
-        $productValidator = new ProductValidator();
-        $productValidator->validateInputs($this->request);
-
-        $product = Product::findOrFail($id);
-        $product->update($this->request->all());
-
-        return new JsonResponse($product);
+        return new UpdateProductOutput($product);
     }
 }

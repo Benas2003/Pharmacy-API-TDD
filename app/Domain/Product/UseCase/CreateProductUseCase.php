@@ -2,29 +2,20 @@
 
 namespace App\Domain\Product\UseCase;
 
-use App\Domain\Product\Validator\ProductValidator;
+use App\Domain\Product\DTO\CreateProductUseCaseDTO\CreateProductInput;
+use App\Domain\Product\DTO\CreateProductUseCaseDTO\CreateProductOutput;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class CreateProductUseCase
 {
-    private Request $request;
-
-    public function __construct(Request $request)
+    public function execute(CreateProductInput $createProductInput): CreateProductOutput
     {
-        $this->request = $request;
-    }
+        $product = Product::create($createProductInput->getProduct()->toArray());
 
-    public function execute(): JsonResponse
-    {
-        $productValidator = new ProductValidator();
-        $productValidator->validateInputs($this->request);
-
-        $product = Product::create($this->request->all());
-
-        return new JsonResponse($product, ResponseAlias::HTTP_CREATED);
+        return new CreateProductOutput($product);
+//        return new JsonResponse($product, ResponseAlias::HTTP_CREATED);
     }
 
 }
