@@ -22,7 +22,7 @@ class OrderFactory extends Factory
      */
     public function definition(): array
     {
-        $productFactory = new \App\Domain\Product\Factory\ProductFactory();
+        $productFactory = new \App\Domain\Product\Factory\ProductFactory(\Faker\Factory::create());
         $product = Product::create($productFactory->fakeProduct());
 
         $orderFactory = new \App\Domain\Order\Factory\OrderFactory(\Faker\Factory::create());

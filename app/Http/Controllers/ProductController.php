@@ -2,17 +2,39 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Product\Infrastructure\Database\ProductDatabase;
-use App\Domain\Product\Services\searchService;
-use App\Domain\Product\Services\stockUpdateService;
+use App\Domain\Product\DTO\CreateProductUseCaseDTO\CreateProductInput;
+use App\Domain\Product\DTO\DestroyProductUseCaseDTO\DestroyProductInput;
+use App\Domain\Product\DTO\StockUpdateServiceDTO\StockUpdateInput;
+use App\Domain\Product\DTO\UpdateProductUseCaseDTO\UpdateProductInput;
+use App\Domain\Product\Repository\ProductRepository;
+use App\Domain\Product\Services\SearchService;
+use App\Domain\Product\Services\StockUpdateService;
 use App\Domain\Product\UseCase\CreateProductUseCase;
 use App\Domain\Product\UseCase\DestroyProductUseCase;
 use App\Domain\Product\UseCase\UpdateProductUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Psy\Util\Json;
 
 class ProductController extends Controller
 {
+    private ProductRepository $productRepository;
+    private CreateProductUseCase $createProductUseCase;
+    private UpdateProductUseCase $updateProductUseCase;
+    private DestroyProductUseCase $destroyProductUseCase;
+    private SearchService $searchService;
+    private StockUpdateService $stockUpdateService;
+
+    public function __construct(ProductRepository $productRepository, CreateProductUseCase $createProductUseCase, UpdateProductUseCase $updateProductUseCase, DestroyProductUseCase $destroyProductUseCase, SearchService $searchService, StockUpdateService $stockUpdateService)
+    {
+        $this->productRepository = $productRepository;
+        $this->createProductUseCase = $createProductUseCase;
+        $this->updateProductUseCase = $updateProductUseCase;
+        $this->destroyProductUseCase = $destroyProductUseCase;
+        $this->searchService = $searchService;
+        $this->stockUpdateService = $stockUpdateService;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -20,8 +42,8 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-        $productRepository = new ProductDatabase();
-        return $productRepository->getAllProducts();
+
+        return new JsonResponse($this->productRepository->getAllProducts());
     }
 
     /**
@@ -32,8 +54,8 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $createProductUseCase = new CreateProductUseCase($request);
-        return $createProductUseCase->execute();
+        $createProductInput = new CreateProductInput($request);
+        return new JsonResponse($this->createProductUseCase->execute($createProductInput)->toArray(), 201);
     }
 
     /**
@@ -44,8 +66,7 @@ class ProductController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $productRepository = new ProductDatabase();
-        return $productRepository->getProductById($id);
+        return new JsonResponse($this->productRepository->getProductById($id));
     }
 
     /**
@@ -57,20 +78,21 @@ class ProductController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $updateProductUseCase = new UpdateProductUseCase($request);
-        return $updateProductUseCase->execute($id);
+        $updateProductInput = new UpdateProductInput($id, $request);
+        return new JsonResponse($this->updateProductUseCase->execute($updateProductInput)->toArray());
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function destroy(int $id): JsonResponse
     {
-        $destroyProductUseCase = new DestroyProductUseCase();
-        return $destroyProductUseCase->execute($id);
+        $destroyProductInput = new DestroyProductInput($id);
+        $this->destroyProductUseCase->execute($destroyProductInput);
+        return new JsonResponse(null, 204);
     }
 
     /**
@@ -81,8 +103,7 @@ class ProductController extends Controller
      */
     public function search(string $name): JsonResponse
     {
-        $searchService = new searchService();
-        return $searchService->searchByName($name);
+        return new JsonResponse($this->searchService->searchByName($name));
     }
 
     /**
@@ -93,7 +114,7 @@ class ProductController extends Controller
      */
     public function stockUpdate(int $id, int $amount): void
     {
-        $stockUpdateService = new stockUpdateService();
-        $stockUpdateService->execute($id, $amount);
+        $stockUpdateInput = new StockUpdateInput($id, $amount);
+        $this->stockUpdateService->execute($stockUpdateInput);
     }
 }
