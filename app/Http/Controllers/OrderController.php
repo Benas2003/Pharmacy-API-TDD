@@ -2,11 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Domain\Order\DTO\OrderUpdateInput;
 use App\Domain\Order\UseCase\OrderUpdateUseCase;
 use Illuminate\Http\JsonResponse;
 
 class OrderController extends Controller
 {
+    private OrderUpdateUseCase $orderUpdateUseCase;
+
+    public function __construct(OrderUpdateUseCase $orderUpdateUseCase)
+    {
+        $this->orderUpdateUseCase = $orderUpdateUseCase;
+    }
+
+
     /**
      * Update the specified resource in storage.
      *
@@ -16,8 +25,7 @@ class OrderController extends Controller
      */
     public function update(int $id, int $amount): JsonResponse
     {
-        $orderUpdateUseCase = new OrderUpdateUseCase();
-        $orderUpdateUseCase->execute($id, $amount);
-        return $orderUpdateUseCase->execute($id, $amount);
+        $orderUpdateInput = new OrderUpdateInput($id, $amount);
+        return new JsonResponse($this->orderUpdateUseCase->execute($orderUpdateInput)->toArray());
     }
 }

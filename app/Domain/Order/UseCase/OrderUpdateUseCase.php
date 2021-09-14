@@ -2,24 +2,26 @@
 
 namespace App\Domain\Order\UseCase;
 
+use App\Domain\Order\DTO\OrderUpdateInput;
+use App\Domain\Order\DTO\OrderUpdateOutput;
 use App\Domain\Order\Exceptions\DeliveredOrderStatusException;
 use App\Domain\Order\Validator\OrderValidator;
 use App\Models\Order;
 
-use Illuminate\Http\JsonResponse;
-
 class OrderUpdateUseCase
 {
-    public function execute(int $id, int $amount): JsonResponse|DeliveredOrderStatusException
+    public function execute(OrderUpdateInput $input): OrderUpdateOutput|DeliveredOrderStatusException
     {
-        $order = Order::findOrFail($id);
         $orderValidator = new OrderValidator();
 
-        $orderValidator->validateAmount($amount);
+        $order = Order::findOrFail($input->getId());
+
+        $orderValidator->validateAmount($input->getAmount());
 
         if ($order->status === 'Ordered') {
-            $order->update(['amount' => $amount]);
-            return new JsonResponse($order);
+            $order->update(['amount' => $input->getAmount()]);
+
+            return new OrderUpdateOutput($order);
         }
         throw new DeliveredOrderStatusException();
     }
