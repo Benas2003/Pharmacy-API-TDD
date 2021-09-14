@@ -2,7 +2,7 @@
 
 namespace App\Exports;
 
-use App\Domain\Order\Infrastructure\Database\OrderDatabase;
+use App\Domain\Order\Repository\OrderRepository;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
 
@@ -13,7 +13,7 @@ class OrdersExport implements FromCollection
     */
     public function collection(): Collection
     {
-        $orderRepository = new OrderDatabase();
+        $orderRepository = new OrderRepository();
 
 
         $title = [

@@ -25,7 +25,7 @@ class OrderFactory extends Factory
         $productFactory = new \App\Domain\Product\Factory\ProductFactory();
         $product = Product::create($productFactory->fakeProduct());
 
-        $orderFactory = new \App\Domain\Order\Factory\OrderFactory();
+        $orderFactory = new \App\Domain\Order\Factory\OrderFactory(\Faker\Factory::create());
         return $orderFactory->fakeOrder($product);
     }
 }
