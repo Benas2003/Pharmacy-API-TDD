@@ -2,39 +2,23 @@
 
 namespace App\Domain\Consignment\UseCase;
 
+use App\Domain\Consignment\DTO\UpdateConsignmentProductUseCaseDTO\UpdateConsignmentProductInput;
+use App\Domain\Consignment\DTO\UpdateConsignmentProductUseCaseDTO\UpdateConsignmentProductOutput;
 use App\Domain\Consignment\Exceptions\InvalidStatusException;
-use App\Domain\Consignment\Validator\ConsignmentValidator;
-use App\Models\Consignment;
-use App\Models\ConsignmentProduct;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class UpdateConsignmentProductUseCase
 {
-
-    private Request $request;
-
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    public function execute(int $id): JsonResponse
+    public function execute(UpdateConsignmentProductInput $updateConsignmentProductInput): UpdateConsignmentProductOutput
     {
 
-        $consignmentValidator = new ConsignmentValidator();
-        $consignmentValidator->validateAmount($this->request);
-
-
-        $product = ConsignmentProduct::findOrFail($id);
-        $consignment = Consignment::find($product->consignment_id);
+        $product = $updateConsignmentProductInput->getProduct();
+        $consignment = $updateConsignmentProductInput->getConsignment();
 
         if($consignment->status === 'Created')
         {
-            $product->update(['amount'=>$this->request['amount']]);
-            return new JsonResponse($product);
+            $product->update(['amount'=>$updateConsignmentProductInput->getAmount()]);
+            return new UpdateConsignmentProductOutput($product);
         }
 
         throw new InvalidStatusException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);

@@ -141,7 +141,7 @@ class ConsignmentControllerTest extends TestCase
         $this->get(route('consignments.show', self::DEPARTMENT_USER_ID))
             ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
                 'Status',
-                'Products:'
+                'Products'
             ]);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
@@ -159,15 +159,7 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->get(route('consignments.index'))
-            ->assertStatus(ResponseAlias::HTTP_OK)->assertJsonStructure([
-                "*"=>[
-                    "id",
-                    "department_id",
-                    "status",
-                    "created_at",
-                    "updated_at"
-                ]
-            ]);
+            ->assertStatus(ResponseAlias::HTTP_OK);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);

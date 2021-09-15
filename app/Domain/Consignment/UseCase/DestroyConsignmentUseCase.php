@@ -2,22 +2,28 @@
 
 namespace App\Domain\Consignment\UseCase;
 
+use App\Domain\Consignment\DTO\DestroyConsignmentUseCaseDTO\DestroyConsignmentInput;
 use App\Domain\Consignment\Exceptions\InvalidConsignmentStatusException;
-use App\Models\Consignment;
-use Illuminate\Http\JsonResponse;
+use App\Domain\Consignment\Repository\ConsignmentRepository;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
 class DestroyConsignmentUseCase
 {
-    public function execute(int $id): JsonResponse
+    private ConsignmentRepository $consignmentRepository;
+
+    public function __construct(ConsignmentRepository $consignmentRepository)
     {
-        $consignment = Consignment::findOrFail($id);
+        $this->consignmentRepository = $consignmentRepository;
+    }
+
+    public function execute(DestroyConsignmentInput $destroyConsignmentInput): void
+    {
+        $consignment = $this->consignmentRepository->getSpecificConsignment($destroyConsignmentInput->getId());
 
         if($consignment->status !== 'Created')
         {
             throw new InvalidConsignmentStatusException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
         }
         $consignment->delete();
-        return new JsonResponse(null, ResponseAlias::HTTP_NO_CONTENT);
     }
 }
