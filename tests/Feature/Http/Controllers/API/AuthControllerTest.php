@@ -26,25 +26,13 @@ class AuthControllerTest extends TestCase
         $user = User::factory()->make();
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $response = $this->post(route('register'), [
+        $this->post(route('register', "Department"), [
             'name' => $user->name,
             'email' => $user->email,
             'password' => $user->password,
             'password_confirmation' => $user->password,
-            'role' => 'Department'
         ])
             ->assertStatus(ResponseAlias::HTTP_CREATED);
-
-        $response->assertJsonStructure([
-            'user' => [
-                'created_at',
-                'email',
-                'id',
-                'name',
-                'updated_at',
-            ],
-            'message'
-        ]);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
@@ -58,17 +46,6 @@ class AuthControllerTest extends TestCase
             'password_confirmation' => self::ADMIN_PASSWORD,
         ])
             ->assertStatus(ResponseAlias::HTTP_OK);
-
-        $response->assertJsonStructure([
-            'user' => [
-                'created_at',
-                'email',
-                'id',
-                'name',
-                'updated_at',
-            ],
-            'token'
-        ]);
 
         $userToken = $response->json('token');
         $this->withHeader("Authorization", "Bearer $userToken");

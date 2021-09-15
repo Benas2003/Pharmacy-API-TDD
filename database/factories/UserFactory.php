@@ -24,7 +24,7 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
-        $userFactory = new \App\Domain\User\Factory\UserFactory();
+        $userFactory = new \App\Domain\User\Factory\UserFactory(\Faker\Factory::create());
         return $userFactory->fakeUser();
     }
 

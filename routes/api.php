@@ -27,7 +27,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Auth routes
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::post('/register', [AuthController::class, 'register'])->name('register');
+    Route::post('/register/{role}', [AuthController::class, 'register'])->name('register');
 
 
     // Routes with Administrator role

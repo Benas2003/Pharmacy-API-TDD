@@ -36,14 +36,4 @@ class UserValidatorRules
             'email' => 'required|string|unique:users,email',
         ]);
     }
-
-    public function roleValidator(Request $request): \Illuminate\Contracts\Validation\Validator
-    {
-        return Validator::make($request->all(), [
-            'role'=>[
-                'required',
-                Rule::in(['Admin', 'Pharmacist', 'Department']),
-            ],
-        ]);
-    }
 }

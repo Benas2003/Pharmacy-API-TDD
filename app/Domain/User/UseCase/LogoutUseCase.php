@@ -2,15 +2,17 @@
 
 namespace App\Domain\User\UseCase;
 
-use Illuminate\Http\JsonResponse;
-use Symfony\Component\HttpFoundation\Response as ResponseAlias;
+use App\Domain\User\DTO\LogoutUseCaseDTO\LogoutInput;
 
 class LogoutUseCase
 {
-    public function execute(): JsonResponse
+    public function execute(LogoutInput $logoutInput): void
     {
-        auth()->user()->tokens()->delete();
+        $user = $logoutInput->getAuth();
+//        $user = Auth::user();
+//        dd($user, auth());
+        $user->tokens()->delete();
+//        auth()->user()->tokens()->delete();
 
-        return new JsonResponse(null, ResponseAlias::HTTP_NO_CONTENT);
     }
 }
