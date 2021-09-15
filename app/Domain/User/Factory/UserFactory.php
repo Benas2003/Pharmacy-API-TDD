@@ -2,19 +2,24 @@
 
 namespace App\Domain\User\Factory;
 
-use Faker\Factory;
+use Faker\Generator;
 
 class UserFactory
 {
+    private Generator $generator;
+
+    public function __construct(Generator $generator)
+    {
+        $this->generator = $generator;
+    }
+
     public function fakeUser(): array
     {
-        $faker = Factory::create();
-
         $user = [];
 
-        $user['name'] = $faker->name();
-        $user['email'] = $faker->unique()->safeEmail();
-        $user['password'] = bcrypt($faker->password);
+        $user['name'] = $this->generator->name();
+        $user['email'] = $this->generator->unique()->safeEmail();
+        $user['password'] = bcrypt($this->generator->password);
 
         return $user;
     }

@@ -17,7 +17,6 @@ class RegisterValidator
         $nameValidator = $rules->nameValidator($request);
         $emailValidator = $rules->registerEmailValidator($request);
         $passwordValidator = $rules->passwordValidator($request);
-        $roleValidator = $rules->roleValidator($request);
 
         if ($nameValidator->fails()) {
             throw new InvalidNameInputException();
@@ -29,10 +28,6 @@ class RegisterValidator
 
         if ($passwordValidator->fails()) {
             throw new InvalidPasswordInputException();
-        }
-
-        if ($roleValidator->fails()) {
-            throw new InvalidRoleInputException();
         }
     }
 }
