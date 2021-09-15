@@ -25,7 +25,7 @@ class ConsignmentProductFactory extends Factory
         $productFactory = new \App\Domain\Product\Factory\ProductFactory(\Faker\Factory::create());
         $product = Product::create($productFactory->fakeProduct());
 
-        $consignmentProductFactory = new \App\Domain\Consignment\Factory\ConsignmentProductFactory();
+        $consignmentProductFactory = new \App\Domain\Consignment\Factory\ConsignmentProductFactory(\Faker\Factory::create());
         return $consignmentProductFactory->fakeConsignmentProduct($product);
     }
 }

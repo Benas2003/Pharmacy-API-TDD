@@ -14,7 +14,6 @@ use App\Domain\Product\UseCase\DestroyProductUseCase;
 use App\Domain\Product\UseCase\UpdateProductUseCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Psy\Util\Json;
 
 class ProductController extends Controller
 {

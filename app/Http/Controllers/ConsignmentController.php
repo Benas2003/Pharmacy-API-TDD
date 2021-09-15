@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Domain\Consignment\Infrastructure\Database\ConsignmentDatabase;
+use App\Domain\Consignment\DTO\CreateConsignmentUseCaseDTO\CreateConsignmentInput;
+use App\Domain\Consignment\DTO\DestroyConsignmentUseCaseDTO\DestroyConsignmentInput;
+use App\Domain\Consignment\DTO\UpdateConsignmentUseCaseDTO\UpdateConsignmentInput;
+use App\Domain\Consignment\Repository\ConsignmentRepository;
 use App\Domain\Consignment\UseCase\CreateConsignmentUseCase;
 use App\Domain\Consignment\UseCase\DestroyConsignmentUseCase;
 use App\Domain\Consignment\UseCase\UpdateConsignmentUseCase;
@@ -10,9 +13,23 @@ use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ConsignmentController extends Controller
 {
+    private ConsignmentRepository $consignmentRepository;
+    private CreateConsignmentUseCase $createConsignmentUseCase;
+    private DestroyConsignmentUseCase $destroyConsignmentUseCase;
+    private UpdateConsignmentUseCase $updateConsignmentUseCase;
+
+    public function __construct(ConsignmentRepository $consignmentRepository, CreateConsignmentUseCase $createConsignmentUseCase, DestroyConsignmentUseCase $destroyConsignmentUseCase, UpdateConsignmentUseCase $updateConsignmentUseCase)
+    {
+        $this->consignmentRepository = $consignmentRepository;
+        $this->createConsignmentUseCase = $createConsignmentUseCase;
+        $this->destroyConsignmentUseCase = $destroyConsignmentUseCase;
+        $this->updateConsignmentUseCase = $updateConsignmentUseCase;
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -20,8 +37,7 @@ class ConsignmentController extends Controller
      */
     public function index(): JsonResponse
     {
-        $consignmentRepository = new ConsignmentDatabase();
-        return $consignmentRepository->getAllProducts();
+        return new JsonResponse($this->consignmentRepository->getAllConsignments());
     }
 
     /**
@@ -32,8 +48,8 @@ class ConsignmentController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $createConsignmentUseCase = new CreateConsignmentUseCase($request);
-        return $createConsignmentUseCase->execute();
+        $createConsignmentInput = new CreateConsignmentInput($request, Auth::user());
+        return new JsonResponse($this->createConsignmentUseCase->execute($createConsignmentInput)->toArray(), 201);
     }
 
     /**
@@ -44,8 +60,7 @@ class ConsignmentController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $consignmentRepository = new ConsignmentDatabase();
-        return $consignmentRepository->getProductById($id);
+        return new JsonResponse($this->consignmentRepository->getConsignmentById($id)->toArray());
     }
 
     /**
@@ -59,8 +74,10 @@ class ConsignmentController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $updateConsignmentUseCase = new UpdateConsignmentUseCase($request);
-        return $updateConsignmentUseCase->execute($id);
+        $updateConsignmentInput = new UpdateConsignmentInput($request, $id, Auth::user());
+
+        $this->updateConsignmentUseCase->execute($updateConsignmentInput);
+        return new JsonResponse($this->updateConsignmentUseCase->execute($updateConsignmentInput)->toArray());
     }
 
     /**
@@ -71,7 +88,8 @@ class ConsignmentController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        $destroyConsignmentUseCase = new DestroyConsignmentUseCase();
-        return $destroyConsignmentUseCase->execute($id);
+        $destroyConsignmentInput = new DestroyConsignmentInput($id);
+        $this->destroyConsignmentUseCase->execute($destroyConsignmentInput);
+        return new JsonResponse(null, 204);
     }
 }
