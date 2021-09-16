@@ -23,7 +23,7 @@ class ConsignmentControllerTest extends TestCase
 
     public function test_create_a_consignment_with_Department_role_returns_created(): void
     {
-        sleep(1);
+        sleep(1.5);
         $loginResponse = $this->post(route('login'), [
             'email' => self::DEPARTMENT_EMAIL,
             'password' => self::DEPARTMENT_PASSWORD,

@@ -39,6 +39,11 @@ To start the server run:
     php artisan serve
 
 
+### CronJob
+To locally start CronJob run:
+
+    php artisan schedule:work
+
 ### Testing
 
 To start tests run:

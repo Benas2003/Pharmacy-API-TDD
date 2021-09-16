@@ -19,7 +19,7 @@ class ConsignmentProductsControllerTest extends TestCase
 
     public function test_update_product_amount_in_Created_consignment_with_Department_role_returns_ok():void
     {
-        sleep(1);
+        sleep(1.5);
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Created',

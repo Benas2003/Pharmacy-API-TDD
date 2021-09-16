@@ -20,7 +20,7 @@ class OrderControllerTest extends TestCase
 
     public function test_update_order_amount_with_Administrator_role_returns_ok(): void
     {
-        sleep(1);
+        sleep(1.5);
         $order=Order::factory()->create([
             'status'=>'Ordered',
         ]);
