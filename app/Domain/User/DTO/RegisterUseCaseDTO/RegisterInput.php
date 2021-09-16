@@ -4,6 +4,7 @@ namespace App\Domain\User\DTO\RegisterUseCaseDTO;
 
 use App\Domain\User\Exceptions\InvalidRoleInputException;
 use App\Domain\User\Validator\RegisterValidator;
+use App\Domain\User\Validator\UserValidatorRules;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -13,11 +14,9 @@ class RegisterInput
     private User $user;
     private string $role;
 
-    public function __construct(Request $request, string $role)
+    public function __construct(Request $request, string $role, RegisterValidator $registerValidator)
     {
-
-        $registerValidator = new RegisterValidator();
-        $registerValidator->validateRegisterInputs($request);
+        $registerValidator->validateRegisterInputs($request, new UserValidatorRules());
 
         if (!in_array($role, self::ROLES))
         {
@@ -26,8 +25,6 @@ class RegisterInput
 
         $this->role = $role;
         $this->user = new User($request->all());
-
-
     }
 
     /**
@@ -45,6 +42,4 @@ class RegisterInput
     {
         return $this->role;
     }
-
-
 }

@@ -5,14 +5,18 @@ namespace App\Http\Controllers;
 use App\Domain\Consignment\DTO\CreateConsignmentUseCaseDTO\CreateConsignmentInput;
 use App\Domain\Consignment\DTO\DestroyConsignmentUseCaseDTO\DestroyConsignmentInput;
 use App\Domain\Consignment\DTO\UpdateConsignmentUseCaseDTO\UpdateConsignmentInput;
+use App\Domain\Consignment\Exceptions\InvalidProductInformationInputException;
 use App\Domain\Consignment\Repository\ConsignmentRepository;
 use App\Domain\Consignment\UseCase\CreateConsignmentUseCase;
 use App\Domain\Consignment\UseCase\DestroyConsignmentUseCase;
 use App\Domain\Consignment\UseCase\UpdateConsignmentUseCase;
+use App\Domain\Consignment\Validator\ConsignmentValidator;
+use App\Domain\Product\Repository\ProductRepository;
 use Exception;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 
 class ConsignmentController extends Controller
@@ -21,13 +25,24 @@ class ConsignmentController extends Controller
     private CreateConsignmentUseCase $createConsignmentUseCase;
     private DestroyConsignmentUseCase $destroyConsignmentUseCase;
     private UpdateConsignmentUseCase $updateConsignmentUseCase;
+    private ConsignmentValidator $consignmentValidator;
+    private ProductRepository $productRepository;
 
-    public function __construct(ConsignmentRepository $consignmentRepository, CreateConsignmentUseCase $createConsignmentUseCase, DestroyConsignmentUseCase $destroyConsignmentUseCase, UpdateConsignmentUseCase $updateConsignmentUseCase)
+    public function __construct(
+        ConsignmentRepository $consignmentRepository,
+        CreateConsignmentUseCase $createConsignmentUseCase,
+        DestroyConsignmentUseCase $destroyConsignmentUseCase,
+        UpdateConsignmentUseCase $updateConsignmentUseCase,
+        ConsignmentValidator $consignmentValidator,
+        ProductRepository $productRepository
+    )
     {
         $this->consignmentRepository = $consignmentRepository;
         $this->createConsignmentUseCase = $createConsignmentUseCase;
         $this->destroyConsignmentUseCase = $destroyConsignmentUseCase;
         $this->updateConsignmentUseCase = $updateConsignmentUseCase;
+        $this->consignmentValidator = $consignmentValidator;
+        $this->productRepository = $productRepository;
     }
 
     /**
@@ -48,7 +63,9 @@ class ConsignmentController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $createConsignmentInput = new CreateConsignmentInput($request, Auth::user());
+        $products = $this->getRequestedProducts($request);
+
+        $createConsignmentInput = new CreateConsignmentInput($products, Auth::user()->id);
         return new JsonResponse($this->createConsignmentUseCase->execute($createConsignmentInput)->toArray(), 201);
     }
 
@@ -74,7 +91,7 @@ class ConsignmentController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $updateConsignmentInput = new UpdateConsignmentInput($request, $id, Auth::user());
+        $updateConsignmentInput = new UpdateConsignmentInput($request, $id, Auth::user()->name, new ConsignmentRepository(), new ConsignmentValidator());
 
         $this->updateConsignmentUseCase->execute($updateConsignmentInput);
         return new JsonResponse($this->updateConsignmentUseCase->execute($updateConsignmentInput)->toArray());
@@ -91,5 +108,20 @@ class ConsignmentController extends Controller
         $destroyConsignmentInput = new DestroyConsignmentInput($id);
         $this->destroyConsignmentUseCase->execute($destroyConsignmentInput);
         return new JsonResponse(null, 204);
+    }
+
+    private function getRequestedProducts(Request $request): Collection
+    {
+        $products = collect();
+        $requested_products = $request->toArray();
+        foreach ($requested_products as $requested_product) {
+            if (!$this->consignmentValidator->validateAmount($requested_product) || !$this->consignmentValidator->validateId($requested_product)) {
+                throw new InvalidProductInformationInputException();
+            }
+            $product = $this->productRepository->getProductById($requested_product['id']);
+            $product->amount = $requested_product['amount'];
+            $products->push($product);
+        }
+        return $products;
     }
 }

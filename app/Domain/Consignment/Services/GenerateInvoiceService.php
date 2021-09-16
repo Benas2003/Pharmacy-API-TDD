@@ -5,7 +5,6 @@ namespace App\Domain\Consignment\Services;
 use App\Domain\Consignment\DTO\InvoiceGeneratorDTO\GenerateInvoiceInput;
 use App\Domain\User\Repository\UserRepository;
 use App\Models\Consignment;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Support\Collection;
 use LaravelDaily\Invoices\Classes\InvoiceItem;
 use LaravelDaily\Invoices\Classes\Party;
@@ -20,7 +19,7 @@ class GenerateInvoiceService
         $this->userRepository = $userRepository;
     }
 
-    public function InvoiceGenerator(GenerateInvoiceInput $generateInvoiceInput): Invoice
+    public function invoiceGenerator(GenerateInvoiceInput $generateInvoiceInput): Invoice
     {
         $consignment = $generateInvoiceInput->getConsignment();
         return Invoice::make("Consignment - #$consignment->id")
@@ -28,7 +27,7 @@ class GenerateInvoiceService
             ->series('EUR-INT-C')
             ->sequence($consignment->id)
             ->serialNumberFormat('{SERIES}{SEQUENCE}')
-            ->seller($this->configureSeller($generateInvoiceInput->getAuth()))
+            ->seller($this->configureSeller($generateInvoiceInput->getUserName()))
             ->buyer($this->configureCustomer($consignment))
             ->dateFormat('Y/m/d')
             ->currencySymbol('€')
@@ -42,12 +41,12 @@ class GenerateInvoiceService
             ->save('public');
     }
 
-    private function getConsignmentItems(Collection $consignment_products): array
+    private function getConsignmentItems(Collection $consignmentProducts): array
     {
-        foreach ($consignment_products as $product) {
-            $consignment_items[] = (new InvoiceItem())->title($product->VSSLPR . ' | ' . $product->name)->pricePerUnit($product->price / $product->amount)->quantity($product->amount);
+        foreach ($consignmentProducts as $product) {
+            $consignmentItems[] = (new InvoiceItem())->title($product->VSSLPR . ' | ' . $product->name)->pricePerUnit($product->price / $product->amount)->quantity($product->amount);
         }
-        return $consignment_items;
+        return $consignmentItems;
     }
 
     private function configureCustomer(Consignment $consignment): Party
@@ -58,10 +57,10 @@ class GenerateInvoiceService
         ]);
     }
 
-    private function configureSeller(Authenticatable $auth): Party
+    private function configureSeller(string $userName): Party
     {
         return new Party([
-            'pharmacist' => $auth->name,
+            'pharmacist' => $userName,
         ]);
     }
 }

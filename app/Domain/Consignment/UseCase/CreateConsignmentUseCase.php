@@ -4,6 +4,7 @@ namespace App\Domain\Consignment\UseCase;
 
 use App\Domain\Consignment\DTO\CreateConsignmentUseCaseDTO\CreateConsignmentInput;
 use App\Domain\Consignment\DTO\CreateConsignmentUseCaseDTO\CreateConsignmentOutput;
+use App\Domain\Consignment\Repository\ConsignmentRepository;
 use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use Illuminate\Support\Collection;
@@ -13,20 +14,13 @@ class CreateConsignmentUseCase
 {
     public function execute(CreateConsignmentInput $createConsignmentInput): CreateConsignmentOutput
     {
-
-        $user = $createConsignmentInput->getAuth();
-
         $consignment = Consignment::create([
-            'department_id'=>$user->id,
+            'department_id' => $createConsignmentInput->getUserId(),
         ]);
 
         $this->addNewProductToConsignment($createConsignmentInput->getProducts(), $consignment);
-        $data = [
-            "Consignment Info"=>$consignment,
-            "Consignment Products:"=>ConsignmentProduct::where('consignment_id', $consignment->id)->get(),
-        ];
 
-        return new CreateConsignmentOutput($consignment);
+        return new CreateConsignmentOutput($consignment, new ConsignmentRepository());
     }
 
     private function addNewProductToConsignment(Collection $products, Consignment $consignment): void

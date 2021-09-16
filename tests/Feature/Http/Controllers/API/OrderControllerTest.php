@@ -18,8 +18,9 @@ class OrderControllerTest extends TestCase
     public const DEPARTMENT_EMAIL = 'cr@icloud.com';
     public const DEPARTMENT_PASSWORD = 'CR91';
 
-    public function test_can_update_order_amount_with_Administrator_role(): void
+    public function test_update_order_amount_with_Administrator_role_returns_ok(): void
     {
+        sleep(1);
         $order=Order::factory()->create([
             'status'=>'Ordered',
         ]);
@@ -39,7 +40,7 @@ class OrderControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_update_order_amount_with_Pharmacist_role(): void
+    public function test_update_order_amount_with_Pharmacist_role_returns_forbidden(): void
     {
         $order=Order::factory()->create([
             'status'=>'Ordered',
@@ -62,7 +63,7 @@ class OrderControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_update_order_amount_with_Department_role(): void
+    public function test_update_order_amount_with_Department_role_returns_forbidden(): void
     {
         $order=Order::factory()->create([
             'status'=>'Ordered',
@@ -85,11 +86,11 @@ class OrderControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_update_order_amount_with_Admin_role_and_Delivered_status(): void
+    public function test_update_order_amount_with_Admin_role_and_Delivered_status_returns_exception(): void
     {
-
         $this->withoutExceptionHandling();
         $this->expectException(DeliveredOrderStatusException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_BAD_REQUEST);
 
         $order=Order::factory()->create([
             'status'=>'Delivered',

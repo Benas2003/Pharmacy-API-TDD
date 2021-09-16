@@ -17,9 +17,9 @@ class ConsignmentRepository
     public function getConsignmentById(int $id): GetConsignmentByIdDTO
     {
         $consignment = Consignment::findOrFail($id);
-        $consignment_products = ConsignmentProduct::where('consignment_id',$consignment->id)->get();
+        $consignmentProducts = ConsignmentProduct::where('consignment_id',$consignment->id)->get();
 
-        return new GetConsignmentByIdDTO($consignment->status, $consignment_products);
+        return new GetConsignmentByIdDTO($consignment->status, $consignmentProducts);
     }
 
     public function getSpecificConsignment(int $id): Consignment

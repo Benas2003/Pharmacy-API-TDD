@@ -12,18 +12,14 @@ class UpdateConsignmentInput
 {
     private Consignment $consignment;
     private string $status;
-    private Authenticatable $auth;
+    private string $userName;
 
-
-    public function __construct(Request $request, int $id, Authenticatable $auth)
+    public function __construct(Request $request, int $id, string $userName, ConsignmentRepository $consignmentRepository, ConsignmentValidator $consignmentValidator)
     {
-        $consignmentRepository = new ConsignmentRepository();
-        $consignmentValidator = new ConsignmentValidator();
-
         $consignmentValidator->validateStatus($request);
 
         $this->status = $request->status;
-        $this->auth = $auth;
+        $this->userName = $userName;
         $this->consignment = $consignmentRepository->getSpecificConsignment($id);
     }
 
@@ -44,12 +40,10 @@ class UpdateConsignmentInput
     }
 
     /**
-     * @return Authenticatable
+     * @return string
      */
-    public function getAuth(): Authenticatable
+    public function getUserName(): string
     {
-        return $this->auth;
+        return $this->userName;
     }
-
-
 }

@@ -28,6 +28,4 @@ class StockUpdateInput
     {
         return $this->amount;
     }
-
-
 }

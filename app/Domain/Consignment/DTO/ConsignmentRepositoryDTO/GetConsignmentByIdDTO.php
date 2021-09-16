@@ -33,6 +33,6 @@ class GetConsignmentByIdDTO
 
     public function toArray(): array
     {
-        return array('Status'=>$this->status, 'Products'=>$this->products);
+        return array('Status' => $this->status, 'Products' => $this->products);
     }
 }

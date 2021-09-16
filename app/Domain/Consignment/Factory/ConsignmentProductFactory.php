@@ -17,7 +17,6 @@ class ConsignmentProductFactory
 
     public function fakeConsignmentProduct(Product $product): array
     {
-
         $consignmentProduct = [];
 
         $consignmentProduct['VSSLPR'] = $product->VSSLPR;

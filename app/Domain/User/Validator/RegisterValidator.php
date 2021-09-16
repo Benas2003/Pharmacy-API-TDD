@@ -10,10 +10,8 @@ use Illuminate\Http\Request;
 
 class RegisterValidator
 {
-    public function validateRegisterInputs(Request $request): void
+    public function validateRegisterInputs(Request $request, UserValidatorRules $rules): void
     {
-        $rules = new UserValidatorRules();
-
         $nameValidator = $rules->nameValidator($request);
         $emailValidator = $rules->registerEmailValidator($request);
         $passwordValidator = $rules->passwordValidator($request);

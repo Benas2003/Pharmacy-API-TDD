@@ -4,7 +4,6 @@ namespace App\Domain\Order\DTO;
 
 class OrderUpdateInput
 {
-
     private int $id;
     private int $amount;
 

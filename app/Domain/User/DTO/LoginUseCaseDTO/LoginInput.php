@@ -3,6 +3,7 @@
 namespace App\Domain\User\DTO\LoginUseCaseDTO;
 
 use App\Domain\User\Validator\LoginValidator;
+use App\Domain\User\Validator\UserValidatorRules;
 use Illuminate\Http\Request;
 
 class LoginInput
@@ -10,10 +11,9 @@ class LoginInput
     private string $email;
     private string $password;
 
-    public function __construct(Request $request)
+    public function __construct(Request $request, LoginValidator $loginValidator)
     {
-        $userValidator = new LoginValidator();
-        $userValidator->validateLoginInputs($request);
+        $loginValidator->validateLoginInputs($request, new UserValidatorRules());
 
         $this->email = $request->email;
         $this->password = $request->password;
@@ -34,6 +34,4 @@ class LoginInput
     {
         return $this->password;
     }
-
-
 }

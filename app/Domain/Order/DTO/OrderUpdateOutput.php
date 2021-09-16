@@ -25,6 +25,4 @@ class OrderUpdateOutput
     {
         return $this->order->toArray();
     }
-
-
 }

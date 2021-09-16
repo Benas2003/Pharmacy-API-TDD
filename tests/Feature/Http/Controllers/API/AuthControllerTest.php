@@ -14,7 +14,7 @@ class AuthControllerTest extends TestCase
     public const WRONG_ADMIN_PASSWORD = 'dmin';
     public const WRONG_ADMIN_EMAIL = 'dmin@icloud.com';
 
-    public function test_user_can_register(): void
+    public function test_user_register_returns_created(): void
     {
         $adminLoginResponse = $this->post(route('login'), [
             'email' => 'admin@icloud.com',
@@ -38,7 +38,7 @@ class AuthControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_user_can_login(): void
+    public function test_user_login_returns_ok(): void
     {
         $response = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -52,10 +52,11 @@ class AuthControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_user_can_not_login_with_wrong_email(): void
+    public function test_user__login_with_wrong_email_returns_exception(): void
     {
         $this->withoutExceptionHandling();
         $this->expectException(InvalidCredentialsInputException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_UNAUTHORIZED);
 
         $this->post(route('login'), [
             'email' => self::WRONG_ADMIN_EMAIL,
@@ -64,10 +65,11 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    public function test_user_can_not_login_with_wrong_password(): void
+    public function test_user_login_with_wrong_password_returns_exception(): void
     {
         $this->withoutExceptionHandling();
         $this->expectException(InvalidCredentialsInputException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_UNAUTHORIZED);
 
         $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -76,7 +78,7 @@ class AuthControllerTest extends TestCase
         ]);
     }
 
-    public function test_user_can_logout(): void
+    public function test_user_logout_returns_no_content(): void
     {
         $userLoginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,

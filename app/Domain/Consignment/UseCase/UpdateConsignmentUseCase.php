@@ -13,7 +13,6 @@ use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use App\Models\Product;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
@@ -36,21 +35,9 @@ class UpdateConsignmentUseCase
      */
     public function execute(UpdateConsignmentInput $updateConsignmentInput): UpdateConsignmentOutput
     {
-
         $consignment = $updateConsignmentInput->getConsignment();
 
-        if($updateConsignmentInput->getStatus() === 'Processed')
-        {
-            $consignment_products = $this->getConsignmentProducts($consignment->id);
-
-            foreach ($consignment_products as $consignment_product)
-            {
-                $storage_product = $this->productRepository->getProductById($consignment_product->product_id);
-                $this->checkHowMuchAmountCanBeGivenAway($storage_product, $consignment_product);
-            }
-
-            $this->InvoiceService($consignment, $consignment_products, $updateConsignmentInput);
-        }
+        $this->updateAmountIfConsignmentProcessed($updateConsignmentInput, $consignment);
 
         $consignment->update([
             'status'=>$updateConsignmentInput->getStatus(),
@@ -59,17 +46,34 @@ class UpdateConsignmentUseCase
         return new UpdateConsignmentOutput($consignment);
     }
 
-    private function checkHowMuchAmountCanBeGivenAway(Product $storage_product, ConsignmentProduct $consignment_product): void
+    /**
+     * @throws Exception
+     */
+    private function updateAmountIfConsignmentProcessed(UpdateConsignmentInput $updateConsignmentInput, Consignment $consignment): void
     {
-        if ($storage_product->amount >= $consignment_product->amount) {
-            $storage_product->update([
-                'amount' => $storage_product->amount - $consignment_product->amount,
+        if ($updateConsignmentInput->getStatus() === 'Processed') {
+            $consignmentProducts = $this->getConsignmentProducts($consignment->id);
+
+            foreach ($consignmentProducts as $consignmentProduct) {
+                $storage_product = $this->productRepository->getProductById($consignmentProduct->product_id);
+                $this->checkHowMuchAmountCanBeGivenAway($storage_product, $consignmentProduct);
+            }
+
+            $this->InvoiceService($consignment, $consignmentProducts, $updateConsignmentInput);
+        }
+    }
+
+    private function checkHowMuchAmountCanBeGivenAway(Product $storageProduct, ConsignmentProduct $consignmentProduct): void
+    {
+        if ($storageProduct->amount >= $consignmentProduct->amount) {
+            $storageProduct->update([
+                'amount' => $storageProduct->amount - $consignmentProduct->amount,
             ]);
         } else {
-            $consignment_product->update([
-                'amount' => $storage_product->amount
+            $consignmentProduct->update([
+                'amount' => $storageProduct->amount
             ]);
-            $storage_product->update([
+            $storageProduct->update([
                 'amount' => 0
             ]);
         }
@@ -77,29 +81,34 @@ class UpdateConsignmentUseCase
 
     private function getConsignmentProducts(int $id): Collection
     {
-        $consignment_products = $this->consignmentProductRepository->getAllProductsByConsignmentId($id);
-        $this->checkIfAmountIsEnough($consignment_products);
-        return $consignment_products;
+        $consignmentProducts = $this->consignmentProductRepository->getAllProductsByConsignmentId($id);
+        $badAmount =  $this->checkIfAmountIsEnough($consignmentProducts);
+        if($badAmount === false)
+        {
+            throw new InvalidNotEnoughAmountException(ResponseAlias::HTTP_BAD_REQUEST);
+        }
+        return $consignmentProducts;
     }
 
-    private function checkIfAmountIsEnough(Collection $consignment_products): void
+    private function checkIfAmountIsEnough(Collection $consignmentProducts): bool
     {
-        foreach ($consignment_products as $consignment_product) {
-            $storage_product = $this->productRepository->getProductById($consignment_product->product_id);
+        foreach ($consignmentProducts as $consignmentProduct) {
+            $storageProduct = $this->productRepository->getProductById($consignmentProduct->product_id);
 
-            if ($storage_product->amount === 0) {
-                throw new InvalidNotEnoughAmountException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+            if ($storageProduct->amount === 0) {
+                return false;
             }
         }
+        return true;
     }
 
     /**
      * @throws Exception
      */
-    private function InvoiceService(Consignment $consignment, Collection $consignment_products, UpdateConsignmentInput $updateConsignmentInput): void
+    private function InvoiceService(Consignment $consignment, Collection $consignmentProducts, UpdateConsignmentInput $updateConsignmentInput): void
     {
-        $generateInvoiceInput = new GenerateInvoiceInput($consignment, $consignment_products, $updateConsignmentInput->getAuth());
-        $invoice = $this->generateInvoiceService->InvoiceGenerator($generateInvoiceInput);
+        $generateInvoiceInput = new GenerateInvoiceInput($consignment, $consignmentProducts, $updateConsignmentInput->getUserName());
+        $invoice = $this->generateInvoiceService->invoiceGenerator($generateInvoiceInput);
         $invoice->download();
     }
 }

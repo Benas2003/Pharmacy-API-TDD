@@ -8,15 +8,15 @@ use Illuminate\Support\Collection;
 
 class GenerateInvoiceInput
 {
-    private Collection $consignment_products;
+    private Collection $consignmentProducts;
     private Consignment $consignment;
-    private Authenticatable $auth;
+    private string $userName;
 
-    public function __construct(Consignment $consignment, Collection $consignment_products, Authenticatable $auth)
+    public function __construct(Consignment $consignment, Collection $consignmentProducts, string $userName)
     {
         $this->consignment = $consignment;
-        $this->consignment_products = $consignment_products;
-        $this->auth = $auth;
+        $this->consignmentProducts = $consignmentProducts;
+        $this->userName = $userName;
     }
 
     /**
@@ -24,7 +24,7 @@ class GenerateInvoiceInput
      */
     public function getConsignmentProducts(): Collection
     {
-        return $this->consignment_products;
+        return $this->consignmentProducts;
     }
 
     /**
@@ -36,12 +36,10 @@ class GenerateInvoiceInput
     }
 
     /**
-     * @return Authenticatable
+     * @return string
      */
-    public function getAuth(): Authenticatable
+    public function getUserName(): string
     {
-        return $this->auth;
+        return $this->userName;
     }
-
-
 }

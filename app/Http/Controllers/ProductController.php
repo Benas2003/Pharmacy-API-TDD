@@ -12,6 +12,7 @@ use App\Domain\Product\Services\StockUpdateService;
 use App\Domain\Product\UseCase\CreateProductUseCase;
 use App\Domain\Product\UseCase\DestroyProductUseCase;
 use App\Domain\Product\UseCase\UpdateProductUseCase;
+use App\Domain\Product\Validator\ProductValidator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -24,7 +25,14 @@ class ProductController extends Controller
     private SearchService $searchService;
     private StockUpdateService $stockUpdateService;
 
-    public function __construct(ProductRepository $productRepository, CreateProductUseCase $createProductUseCase, UpdateProductUseCase $updateProductUseCase, DestroyProductUseCase $destroyProductUseCase, SearchService $searchService, StockUpdateService $stockUpdateService)
+    public function __construct(
+        ProductRepository $productRepository,
+        CreateProductUseCase $createProductUseCase,
+        UpdateProductUseCase $updateProductUseCase,
+        DestroyProductUseCase $destroyProductUseCase,
+        SearchService $searchService,
+        StockUpdateService $stockUpdateService
+    )
     {
         $this->productRepository = $productRepository;
         $this->createProductUseCase = $createProductUseCase;
@@ -53,7 +61,7 @@ class ProductController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $createProductInput = new CreateProductInput($request);
+        $createProductInput = new CreateProductInput($request, new ProductValidator());
         return new JsonResponse($this->createProductUseCase->execute($createProductInput)->toArray(), 201);
     }
 
@@ -77,7 +85,7 @@ class ProductController extends Controller
      */
     public function update(Request $request, int $id): JsonResponse
     {
-        $updateProductInput = new UpdateProductInput($id, $request);
+        $updateProductInput = new UpdateProductInput($id, $request, new ProductValidator());
         return new JsonResponse($this->updateProductUseCase->execute($updateProductInput)->toArray());
     }
 

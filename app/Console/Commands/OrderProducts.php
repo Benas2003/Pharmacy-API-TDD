@@ -2,12 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Domain\Order\Infrastructure\Database\OrderDatabase;
+use App\Domain\Order\Repository\OrderRepository;
 use App\Exports\OrdersExport;
 use App\Models\Order;
 use App\Models\Product;
-use Faker\Factory;
+use Faker\Generator;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OrderProducts extends Command
@@ -26,66 +27,70 @@ class OrderProducts extends Command
      */
     protected $description = 'Order products automatically based on their live count.';
 
+    private OrderRepository $orderRepository;
+    private Generator $generator;
+
     /**
      * Create a new command instance.
      *
      * @return void
      */
-    public function __construct()
+    public function __construct(OrderRepository $orderRepository, Generator $generator)
     {
+        $this->orderRepository = $orderRepository;
+        $this->generator = $generator;
         parent::__construct();
     }
 
 
-    public function handle() :void
+    public function handle(): void
     {
-
         $products = Product::all();
-        $orderRepository = new OrderDatabase();
 
-        foreach ($products as $product)
-        {
-            $already_ordered_amount=0;
-            if($product->storage_amount>$product->amount)
-            {
-                $current_product_orders = $orderRepository->getAllOrdersWithOrderedStatus($product->id);
+        $this->createOrdersForProducts($products);
+        $this->exportDocument();
 
+    }
 
-                $already_ordered_amount = $this->checkAmountWhichIsAlreadyOrdered($current_product_orders, $already_ordered_amount);
+    private function createOrdersForProducts(Collection|array $products): void
+    {
+        foreach ($products as $product) {
 
-                $this->createNewOrderBasedOnAlreadyOrderedAmount($product, $already_ordered_amount);
+            if ($product->storage_amount > $product->amount) {
+                $current_product_orders = $this->orderRepository->getAllOrdersWithOrderedStatus($product->id);
+
+                $already_ordered_amount = $this->getAmountWhichIsAlreadyOrdered($current_product_orders);
+
+                $this->createNewOrder($product, $already_ordered_amount);
             }
         }
-        $this->export();
-
     }
 
-    private function export()
+    private function getAmountWhichIsAlreadyOrdered($current_product_orders): int
     {
-        return Excel::store(new OrdersExport, 'orders-'.date('Y-m-d').'.xlsx');
-    }
-
-    private function checkAmountWhichIsAlreadyOrdered($current_product_orders, $already_ordered_amount)
-    {
+        $already_ordered_amount = 0;
         foreach ($current_product_orders as $order) {
             $already_ordered_amount += $order->amount;
         }
         return $already_ordered_amount;
     }
 
-    private function createNewOrderBasedOnAlreadyOrderedAmount(mixed $product, $already_ordered_amount): void
+    private function createNewOrder(mixed $product, $already_ordered_amount): void
     {
-        $faker = Factory::create();
-
         $ordering_amount = $product->storage_amount - ($product->amount + $already_ordered_amount);
         if ($ordering_amount > 0) {
             Order::create([
                 'product_id' => $product->id,
-                'EUR_INT_O' => $faker->uuid,
+                'EUR_INT_O' => $this->generator->uuid,
                 'name' => $product->name,
                 'amount' => $ordering_amount,
                 'price' => $product->price * $ordering_amount,
             ]);
         }
+    }
+
+    private function exportDocument()
+    {
+        return Excel::store(new OrdersExport, 'orders-' . date('Y-m-d') . '.xlsx');
     }
 }

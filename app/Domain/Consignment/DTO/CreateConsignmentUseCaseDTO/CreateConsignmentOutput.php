@@ -11,9 +11,8 @@ class CreateConsignmentOutput
     private Consignment $consignment;
     private Collection $products;
 
-    public function __construct(Consignment $consignment)
+    public function __construct(Consignment $consignment, ConsignmentRepository $consignmentRepository)
     {
-        $consignmentRepository = new ConsignmentRepository();
         $this->consignment = $consignment;
         $this->products = $consignmentRepository->getConsignmentById($consignment->id)->getProducts();
     }
@@ -36,6 +35,6 @@ class CreateConsignmentOutput
 
     public function toArray(): array
     {
-        return array('Consignment'=>$this->consignment->toArray(), 'Consignment Products'=>$this->products->toArray());
+        return array('Consignment' => $this->consignment->toArray(), 'Consignment Products' => $this->products->toArray());
     }
 }

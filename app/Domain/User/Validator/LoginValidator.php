@@ -8,10 +8,8 @@ use Illuminate\Http\Request;
 
 class LoginValidator
 {
-    public function validateLoginInputs(Request $request): void
+    public function validateLoginInputs(Request $request, UserValidatorRules $rules): void
     {
-        $rules = new UserValidatorRules();
-
         $emailValidator = $rules->loginEmailValidator($request);
 
         $passwordValidator = $rules->passwordValidator($request);

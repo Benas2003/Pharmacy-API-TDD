@@ -15,7 +15,6 @@ class OrderController extends Controller
         $this->orderUpdateUseCase = $orderUpdateUseCase;
     }
 
-
     /**
      * Update the specified resource in storage.
      *

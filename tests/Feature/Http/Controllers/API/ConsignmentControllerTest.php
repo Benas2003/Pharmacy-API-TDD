@@ -21,8 +21,9 @@ class ConsignmentControllerTest extends TestCase
     public const DEPARTMENT_PASSWORD = 'CR91';
 
 
-    public function test_can_create_a_consignment_with_Department_role(): void
+    public function test_create_a_consignment_with_Department_role_returns_created(): void
     {
+        sleep(1);
         $loginResponse = $this->post(route('login'), [
             'email' => self::DEPARTMENT_EMAIL,
             'password' => self::DEPARTMENT_PASSWORD,
@@ -42,7 +43,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_create_a_consignment_with_Admin_role(): void
+    public function test_create_a_consignment_with_Admin_role_returns_forbidden(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -64,7 +65,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_create_a_consignment_with_Pharmacist_role(): void
+    public function test_create_a_consignment_with_Pharmacist_role_returns_forbidden(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::PHARMACIST_EMAIL,
@@ -86,7 +87,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_update_a_consignment_with_Pharmacist_role(): void
+    public function test_update_a_consignment_with_Pharmacist_role_returns_ok(): void
     {
         $consignment = Consignment::factory()->create([
             'department_id'=> self::DEPARTMENT_USER_ID,
@@ -111,7 +112,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_update_a_consignment_with_Admin_role(): void
+    public function test_update_a_consignment_with_Admin_role_returns_forbidden(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -128,7 +129,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_show_a_product(): void
+    public function test_show_a_product_returns_ok_and_data(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -148,7 +149,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_show_products(): void
+    public function test_show_products_returns_ok(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -165,7 +166,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_delete_products_with_Created_status(): void
+    public function test_delete_products_with_Created_status_returns_no_content(): void
     {
 
         $consignment = Consignment::factory()->create([
@@ -188,10 +189,11 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_delete_products_with_Given_away_status(): void
+    public function test_delete_products_with_Given_away_status_returns_bad_request(): void
     {
         $this->withoutExceptionHandling();
         $this->expectException(InvalidConsignmentStatusException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_BAD_REQUEST);
 
         $consignment = Consignment::factory()->create([
             'department_id'=> self::DEPARTMENT_USER_ID,
@@ -206,18 +208,18 @@ class ConsignmentControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->delete(route('consignments.destroy', $consignment->id))
-            ->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $this->delete(route('consignments.destroy', $consignment->id));
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_delete_products_with_Processed_status(): void
+    public function test_delete_products_with_Processed_status_returns_bad_request(): void
     {
 
         $this->withoutExceptionHandling();
         $this->expectException(InvalidConsignmentStatusException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_BAD_REQUEST);
 
         $consignment = Consignment::factory()->create([
             'department_id'=> self::DEPARTMENT_USER_ID,
@@ -232,14 +234,13 @@ class ConsignmentControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->delete(route('consignments.destroy', $consignment->id))
-            ->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $this->delete(route('consignments.destroy', $consignment->id));
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_delete_products_with_Pharmacist_role(): void
+    public function test_delete_products_with_Pharmacist_role_returns_forbidden(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::PHARMACIST_EMAIL,

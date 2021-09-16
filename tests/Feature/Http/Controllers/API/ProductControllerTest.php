@@ -20,8 +20,10 @@ class ProductControllerTest extends TestCase
     public const DEPARTMENT_EMAIL = 'cr@icloud.com';
     public const DEPARTMENT_PASSWORD = 'CR91';
 
-    public function test_can_create_a_new_product_with_Admin_role(): void
+
+    public function test_create_a_new_product_with_Admin_role_returns_created(): void
     {
+        sleep(1.5);
         $faker = Factory::create();
 
         $adminLoginResponse = $this->post(route('login'), [
@@ -47,7 +49,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_cannot_create_a_new_product_with_Pharmacist_role(): void
+    public function test_create_a_new_product_with_Pharmacist_role_returns_forbidden(): void
     {
         $faker = Factory::create();
 
@@ -73,7 +75,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_delete_a_product_with_admin_role(): void
+    public function test_delete_a_product_with_admin_role_returns_no_content(): void
     {
         $adminLoginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -92,7 +94,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_cannot_delete_a_product_with_pharmacist_role(): void
+    public function test_delete_a_product_with_pharmacist_role_returns_forbidden(): void
     {
         $pharmacistLoginResponse = $this->post(route('login'), [
             'email' => self::PHARMACIST_EMAIL,
@@ -111,7 +113,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_update_a_product_with_admin_role(): void
+    public function test_update_a_product_with_admin_role_returns_ok(): void
     {
         $faker = Factory::create();
 
@@ -140,7 +142,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_not_update_a_product_with_pharmacist_role(): void
+    public function test_update_a_product_with_pharmacist_role_returns_forbidden(): void
     {
         $faker = Factory::create();
 
@@ -169,7 +171,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_show_a_product_with_department_role(): void
+    public function test_show_a_product_with_department_role_returns_ok(): void
     {
         $departmentLoginResponse = $this->post(route('login'), [
             'email' => self::DEPARTMENT_EMAIL,
@@ -188,7 +190,7 @@ class ProductControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_update_product_amount_with_Pharmacist_role(): void
+    public function test_update_product_amount_with_Pharmacist_role_returns_ok(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::PHARMACIST_EMAIL,

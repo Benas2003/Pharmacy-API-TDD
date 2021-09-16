@@ -12,8 +12,6 @@ class RegisterUseCase
     public function execute(RegisterInput $registerInput): RegisterOutput
     {
         $user = User::create($registerInput->getUser()->toArray());
-
-
         $user->assignRole($registerInput->getRole());
 
         return new RegisterOutput($user, 'User was created successfully');

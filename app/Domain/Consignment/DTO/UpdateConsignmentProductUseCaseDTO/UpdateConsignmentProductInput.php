@@ -15,13 +15,15 @@ class UpdateConsignmentProductInput
     private Consignment $consignment;
     private int $amount;
 
-    public function __construct(Request $request, int $id)
+    public function __construct(
+        Request $request,
+        int $id,
+        ConsignmentValidator $consignmentValidator,
+        ConsignmentProductRepository $consignmentProductRepository,
+        ConsignmentRepository $consignmentRepository
+    )
     {
-        $consignmentValidator = new ConsignmentValidator();
-        $consignmentProductRepository = new ConsignmentProductRepository();
-        $consignmentRepository = new ConsignmentRepository();
-
-        $consignmentValidator->validateAmount($request);
+        $consignmentValidator->validateConsignmentProductAmount($request);
 
         $this->product = $consignmentProductRepository->getConsignmentProductById($id);
         $this->consignment = $consignmentRepository->getSpecificConsignment($this->product->consignment_id);
@@ -51,5 +53,4 @@ class UpdateConsignmentProductInput
     {
         return $this->consignment;
     }
-
 }

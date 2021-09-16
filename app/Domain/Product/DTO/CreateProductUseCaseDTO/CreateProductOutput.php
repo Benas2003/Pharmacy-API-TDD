@@ -25,6 +25,4 @@ class CreateProductOutput
     {
         return $this->product->toArray();
     }
-
-
 }

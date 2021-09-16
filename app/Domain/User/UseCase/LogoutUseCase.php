@@ -8,11 +8,6 @@ class LogoutUseCase
 {
     public function execute(LogoutInput $logoutInput): void
     {
-        $user = $logoutInput->getAuth();
-//        $user = Auth::user();
-//        dd($user, auth());
-        $user->tokens()->delete();
-//        auth()->user()->tokens()->delete();
-
+        $logoutInput->getAuth()->tokens()->delete();
     }
 }

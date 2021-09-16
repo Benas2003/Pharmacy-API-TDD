@@ -10,7 +10,6 @@ use Tests\TestCase;
 
 class ConsignmentProductsControllerTest extends TestCase
 {
-
     public const ADMIN_EMAIL = 'Admin@icloud.com';
     public const ADMIN_PASSWORD = 'Admin';
 
@@ -18,8 +17,9 @@ class ConsignmentProductsControllerTest extends TestCase
     public const DEPARTMENT_EMAIL = 'cr@icloud.com';
     public const DEPARTMENT_PASSWORD = 'CR91';
 
-    public function test_can_update_product_amount_in_Created_consignment_with_Department_role():void
+    public function test_update_product_amount_in_Created_consignment_with_Department_role_returns_ok():void
     {
+        sleep(1);
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
             'status'=>'Created',
@@ -40,10 +40,11 @@ class ConsignmentProductsControllerTest extends TestCase
             ->assertStatus(ResponseAlias::HTTP_OK);
     }
 
-    public function test_can_not_update_product_amount_in_Processed_consignment_with_Department_role():void
+    public function test_update_product_amount_in_Processed_consignment_with_Department_role_returns_exception():void
     {
         $this->withoutExceptionHandling();
         $this->expectException(InvalidStatusException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_BAD_REQUEST);
 
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
@@ -61,14 +62,14 @@ class ConsignmentProductsControllerTest extends TestCase
         $departmentToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $departmentToken");
-        $this->put(route('consignments.products.update', $consignment_product->id),['amount'=>200])
-            ->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $this->put(route('consignments.products.update', $consignment_product->id),['amount'=>200]);
     }
 
-    public function test_can_not_update_product_amount_in_Given_away_consignment_with_Department_role():void
+    public function test_update_product_amount_in_Given_away_consignment_with_Department_role_returns_exception():void
     {
         $this->withoutExceptionHandling();
         $this->expectException(InvalidStatusException::class);
+        $this->expectExceptionCode(ResponseAlias::HTTP_BAD_REQUEST);
 
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
@@ -86,11 +87,10 @@ class ConsignmentProductsControllerTest extends TestCase
         $departmentToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $departmentToken");
-        $this->put(route('consignments.products.update', $consignment_product->id),['amount'=>200])
-            ->assertStatus(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $this->put(route('consignments.products.update', $consignment_product->id),['amount'=>200]);
     }
 
-    public function test_can_not_update_product_amount_in_Created_consignment_with_Administrator_role():void
+    public function test_update_product_amount_in_Created_consignment_with_Administrator_role_returns_forbidden():void
     {
         $consignment = Consignment::factory()->create([
             'department_id'=>self::DEPARTMENT_USER_ID,
