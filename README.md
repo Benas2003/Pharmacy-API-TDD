@@ -4,7 +4,7 @@ Pharmacy API - IPMS<br>
 How API works schema - https://miro.com/app/board/o9J_l5pwayI=/
 
 ## Used technologies
-* Laravel (v8.58.0)
+* Laravel (v8.61.0)
 * PHP (v8.0.3)
 * MySQL (latest)
 
