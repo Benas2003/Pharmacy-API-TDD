@@ -11,5 +11,4 @@ class DestroyProductUseCase
     {
         Product::destroy($destroyProductInput->getId());
     }
-
 }

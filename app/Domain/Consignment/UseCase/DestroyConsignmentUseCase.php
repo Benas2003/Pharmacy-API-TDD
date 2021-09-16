@@ -22,7 +22,7 @@ class DestroyConsignmentUseCase
 
         if($consignment->status !== 'Created')
         {
-            throw new InvalidConsignmentStatusException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+            throw new InvalidConsignmentStatusException(ResponseAlias::HTTP_BAD_REQUEST);
         }
         $consignment->delete();
     }

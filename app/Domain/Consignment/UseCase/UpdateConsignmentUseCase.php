@@ -13,7 +13,6 @@ use App\Models\Consignment;
 use App\Models\ConsignmentProduct;
 use App\Models\Product;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpFoundation\Response as ResponseAlias;
 
@@ -39,7 +38,7 @@ class UpdateConsignmentUseCase
 
         $consignment = $updateConsignmentInput->getConsignment();
 
-        if($updateConsignmentInput->getStatus() === 'Processed')
+        if ($updateConsignmentInput->getStatus() === 'Processed')
         {
             $consignment_products = $this->getConsignmentProducts($consignment->id);
 
@@ -88,7 +87,7 @@ class UpdateConsignmentUseCase
             $storage_product = $this->productRepository->getProductById($consignment_product->product_id);
 
             if ($storage_product->amount === 0) {
-                throw new InvalidNotEnoughAmountException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+                throw new InvalidNotEnoughAmountException(ResponseAlias::HTTP_BAD_REQUEST);
             }
         }
     }

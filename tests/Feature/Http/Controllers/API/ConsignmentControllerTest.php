@@ -32,9 +32,9 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $departmentToken");
         $this->post(route('consignments.store'), [
-            1=>[
-                "id"=>2,
-                "amount"=>100,
+            1 => [
+                "id" => 2,
+                "amount" => 100,
             ]
         ])->assertStatus(ResponseAlias::HTTP_CREATED);
 
@@ -53,9 +53,9 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('consignments.store'), [
-            1=>[
-                "id"=>2,
-                "amount"=>100,
+            1 => [
+                "id" => 2,
+                "amount" => 100,
             ]
         ])
             ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
@@ -75,9 +75,9 @@ class ConsignmentControllerTest extends TestCase
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
         $this->post(route('consignments.store'), [
-            1=>[
-                "id"=>2,
-                "amount"=>100,
+            1 => [
+                "id" => 2,
+                "amount" => 100,
             ]
         ])
             ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
@@ -89,11 +89,11 @@ class ConsignmentControllerTest extends TestCase
     public function test_can_update_a_consignment_with_Pharmacist_role(): void
     {
         $consignment = Consignment::factory()->create([
-            'department_id'=> self::DEPARTMENT_USER_ID,
-            'status'=>'Created'
+            'department_id' => self::DEPARTMENT_USER_ID,
+            'status' => 'Created'
         ]);
         ConsignmentProduct::factory(2)->create([
-            'consignment_id'=>$consignment->id,
+            'consignment_id' => $consignment->id,
         ]);
 
         $loginResponse = $this->post(route('login'), [
@@ -104,7 +104,7 @@ class ConsignmentControllerTest extends TestCase
         $pharmacistToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
-        $this->put(route('consignments.update', $consignment->id),['status'=>'Processed'])
+        $this->put(route('consignments.update', $consignment->id), ['status' => 'Processed'])
             ->assertStatus(ResponseAlias::HTTP_OK);
 
         $this->withHeader("Authorization", "Bearer $pharmacistToken");
@@ -121,14 +121,14 @@ class ConsignmentControllerTest extends TestCase
         $adminToken = $loginResponse->json('token');
 
         $this->withHeader("Authorization", "Bearer $adminToken");
-        $this->put(route('consignments.update', 2),['status'=>'Given away'])
+        $this->put(route('consignments.update', 2), ['status' => 'Given away'])
             ->assertStatus(ResponseAlias::HTTP_FORBIDDEN);
 
         $this->withHeader("Authorization", "Bearer $adminToken");
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_show_a_product(): void
+    public function test_consignment_show_returns_data(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -148,7 +148,7 @@ class ConsignmentControllerTest extends TestCase
         $this->post(route('logout',))->assertNoContent()->assertStatus(ResponseAlias::HTTP_NO_CONTENT);
     }
 
-    public function test_can_show_products(): void
+    public function test_consignment_index_returns_success(): void
     {
         $loginResponse = $this->post(route('login'), [
             'email' => self::ADMIN_EMAIL,
@@ -167,10 +167,9 @@ class ConsignmentControllerTest extends TestCase
 
     public function test_can_delete_products_with_Created_status(): void
     {
-
         $consignment = Consignment::factory()->create([
-            'department_id'=> self::DEPARTMENT_USER_ID,
-            'status'=>'Created'
+            'department_id' => self::DEPARTMENT_USER_ID,
+            'status' => 'Created'
         ]);
 
         $loginResponse = $this->post(route('login'), [
@@ -194,8 +193,8 @@ class ConsignmentControllerTest extends TestCase
         $this->expectException(InvalidConsignmentStatusException::class);
 
         $consignment = Consignment::factory()->create([
-            'department_id'=> self::DEPARTMENT_USER_ID,
-            'status'=>'Given away'
+            'department_id' => self::DEPARTMENT_USER_ID,
+            'status' => 'Given away'
         ]);
 
         $loginResponse = $this->post(route('login'), [
@@ -220,8 +219,8 @@ class ConsignmentControllerTest extends TestCase
         $this->expectException(InvalidConsignmentStatusException::class);
 
         $consignment = Consignment::factory()->create([
-            'department_id'=> self::DEPARTMENT_USER_ID,
-            'status'=>'Processed'
+            'department_id' => self::DEPARTMENT_USER_ID,
+            'status' => 'Processed'
         ]);
 
         $loginResponse = $this->post(route('login'), [

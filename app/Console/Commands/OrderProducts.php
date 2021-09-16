@@ -2,12 +2,13 @@
 
 namespace App\Console\Commands;
 
-use App\Domain\Order\Infrastructure\Database\OrderDatabase;
+use App\Domain\Order\Repository\OrderRepository;
 use App\Exports\OrdersExport;
 use App\Models\Order;
 use App\Models\Product;
 use Faker\Factory;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 
 class OrderProducts extends Command
@@ -36,44 +37,39 @@ class OrderProducts extends Command
         parent::__construct();
     }
 
-
-    public function handle() :void
+    public function handle(): void
     {
-
         $products = Product::all();
-        $orderRepository = new OrderDatabase();
+        $orderRepository = new OrderRepository();
 
-        foreach ($products as $product)
-        {
-            $already_ordered_amount=0;
-            if($product->storage_amount>$product->amount)
-            {
+        $this->createNewOrdersForProducts($products, $orderRepository);
+        $this->exportDocument();
+    }
+
+    private function createNewOrdersForProducts(Collection|array $products, OrderRepository $orderRepository): void
+    {
+        foreach ($products as $product) {
+
+            if ($product->storage_amount > $product->amount) {
                 $current_product_orders = $orderRepository->getAllOrdersWithOrderedStatus($product->id);
 
+                $already_ordered_amount = $this->getAlreadyOrderedProductAmount($current_product_orders);
 
-                $already_ordered_amount = $this->checkAmountWhichIsAlreadyOrdered($current_product_orders, $already_ordered_amount);
-
-                $this->createNewOrderBasedOnAlreadyOrderedAmount($product, $already_ordered_amount);
+                $this->createNewOrder($product, $already_ordered_amount);
             }
         }
-        $this->export();
-
     }
 
-    private function export()
+    private function getAlreadyOrderedProductAmount($current_product_orders): int
     {
-        return Excel::store(new OrdersExport, 'orders-'.date('Y-m-d').'.xlsx');
-    }
-
-    private function checkAmountWhichIsAlreadyOrdered($current_product_orders, $already_ordered_amount)
-    {
+        $already_ordered_amount = 0;
         foreach ($current_product_orders as $order) {
             $already_ordered_amount += $order->amount;
         }
         return $already_ordered_amount;
     }
 
-    private function createNewOrderBasedOnAlreadyOrderedAmount(mixed $product, $already_ordered_amount): void
+    private function createNewOrder(mixed $product, $already_ordered_amount): void
     {
         $faker = Factory::create();
 
@@ -87,5 +83,10 @@ class OrderProducts extends Command
                 'price' => $product->price * $ordering_amount,
             ]);
         }
+    }
+
+    private function exportDocument()
+    {
+        return Excel::store(new OrdersExport, 'orders-' . date('Y-m-d') . '.xlsx');
     }
 }

@@ -15,7 +15,5 @@ class CreateProductUseCase
         $product = Product::create($createProductInput->getProduct()->toArray());
 
         return new CreateProductOutput($product);
-//        return new JsonResponse($product, ResponseAlias::HTTP_CREATED);
     }
-
 }

@@ -11,16 +11,14 @@ class UpdateConsignmentProductUseCase
 {
     public function execute(UpdateConsignmentProductInput $updateConsignmentProductInput): UpdateConsignmentProductOutput
     {
-
         $product = $updateConsignmentProductInput->getProduct();
         $consignment = $updateConsignmentProductInput->getConsignment();
 
-        if($consignment->status === 'Created')
-        {
-            $product->update(['amount'=>$updateConsignmentProductInput->getAmount()]);
-            return new UpdateConsignmentProductOutput($product);
+        if ($consignment->status !== 'Created') {
+            throw new InvalidStatusException(ResponseAlias::HTTP_BAD_REQUEST);
         }
 
-        throw new InvalidStatusException(ResponseAlias::HTTP_METHOD_NOT_ALLOWED);
+        $product->update(['amount' => $updateConsignmentProductInput->getAmount()]);
+        return new UpdateConsignmentProductOutput($product);
     }
 }

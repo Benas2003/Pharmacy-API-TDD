@@ -18,11 +18,12 @@ class OrderUpdateUseCase
 
         $orderValidator->validateAmount($input->getAmount());
 
-        if ($order->status === 'Ordered') {
-            $order->update(['amount' => $input->getAmount()]);
-
-            return new OrderUpdateOutput($order);
+        if ($order->status !== 'Ordered') {
+            throw new DeliveredOrderStatusException();
         }
-        throw new DeliveredOrderStatusException();
+
+        $order->update(['amount' => $input->getAmount()]);
+        return new OrderUpdateOutput($order);
+
     }
 }

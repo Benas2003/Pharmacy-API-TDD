@@ -13,7 +13,6 @@ class CreateConsignmentUseCase
 {
     public function execute(CreateConsignmentInput $createConsignmentInput): CreateConsignmentOutput
     {
-
         $user = $createConsignmentInput->getAuth();
 
         $consignment = Consignment::create([
@@ -21,10 +20,6 @@ class CreateConsignmentUseCase
         ]);
 
         $this->addNewProductToConsignment($createConsignmentInput->getProducts(), $consignment);
-        $data = [
-            "Consignment Info"=>$consignment,
-            "Consignment Products:"=>ConsignmentProduct::where('consignment_id', $consignment->id)->get(),
-        ];
 
         return new CreateConsignmentOutput($consignment);
     }

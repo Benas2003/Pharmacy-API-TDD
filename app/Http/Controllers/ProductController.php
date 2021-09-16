@@ -24,7 +24,14 @@ class ProductController extends Controller
     private SearchService $searchService;
     private StockUpdateService $stockUpdateService;
 
-    public function __construct(ProductRepository $productRepository, CreateProductUseCase $createProductUseCase, UpdateProductUseCase $updateProductUseCase, DestroyProductUseCase $destroyProductUseCase, SearchService $searchService, StockUpdateService $stockUpdateService)
+    public function __construct(
+        ProductRepository $productRepository,
+        CreateProductUseCase $createProductUseCase,
+        UpdateProductUseCase $updateProductUseCase,
+        DestroyProductUseCase $destroyProductUseCase,
+        SearchService $searchService,
+        StockUpdateService $stockUpdateService
+        )
     {
         $this->productRepository = $productRepository;
         $this->createProductUseCase = $createProductUseCase;
@@ -41,7 +48,6 @@ class ProductController extends Controller
      */
     public function index(): JsonResponse
     {
-
         return new JsonResponse($this->productRepository->getAllProducts());
     }
 
@@ -60,7 +66,7 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function show(int $id): JsonResponse
@@ -72,7 +78,7 @@ class ProductController extends Controller
      * Update the specified resource in storage.
      *
      * @param Request $request
-     * @param  int  $id
+     * @param int $id
      * @return JsonResponse
      */
     public function update(Request $request, int $id): JsonResponse
@@ -97,7 +103,7 @@ class ProductController extends Controller
     /**
      * Search for a name.
      *
-     * @param  string  $name
+     * @param string $name
      * @return JsonResponse
      */
     public function search(string $name): JsonResponse
@@ -108,8 +114,8 @@ class ProductController extends Controller
     /**
      * Update product stock
      *
-     * @param  int  $id
-     * @param  int  $amount
+     * @param int $id
+     * @param int $amount
      */
     public function stockUpdate(int $id, int $amount): void
     {

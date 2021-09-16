@@ -34,7 +34,7 @@ class AuthController extends Controller
     public function login(Request $request): JsonResponse
     {
         $loginInput = new LoginInput($request);
-        return new JsonResponse($this->loginUseCase->execute($loginInput)->toArray(), 200);
+        return new JsonResponse($this->loginUseCase->execute($loginInput)->toArray());
     }
 
     public function logout(): JsonResponse
@@ -43,6 +43,4 @@ class AuthController extends Controller
         $this->logoutUseCase->execute($logoutInput);
         return new JsonResponse(null, 204);
     }
-
-
 }

@@ -22,12 +22,9 @@ class LoginUseCase
 
     public function execute(LoginInput $loginInput): LoginOutput
     {
-
-
         $user = $this->userRepository->findByEmail($loginInput->getEmail());
 
-
-        if (!$user || $this->passwordValidator->execute( $loginInput->getPassword(), $user)) {
+        if (!$user || $this->passwordValidator->execute($loginInput->getPassword(), $user)) {
             throw new InvalidCredentialsInputException(ResponseAlias::HTTP_UNAUTHORIZED);
         }
 
